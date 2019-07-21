@@ -22,7 +22,8 @@ endforeach (child)
 # /childs ==============================================================================================================
 
 # include and sources:==================================================================================================
-list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 aux_source_directory(. CURRENT_SRCS)
 aux_source_directory(src CURRENT_SRCS)
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.cpp$")
@@ -63,8 +64,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${FROM_CHILDS_INCDIRS} ${CURRE
 # install
 ## lib
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/lib)
-## headers
-file(GLOB PROJ_HEADERS LIST_DIRECTORIES false ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS} *.h)
+## headers. collecting
+foreach (header_dir ${CURRENT_INCDIRS})
+    file(GLOB HEADERS LIST_DIRECTORIES true ${header_dir}/*.h)
+    list(APPEND PROJ_HEADERS ${HEADERS})
+endforeach (header_dir)
+
+## headers. install
 foreach (header ${PROJ_HEADERS})
     install(FILES ${header} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/include)
 endforeach (header)
