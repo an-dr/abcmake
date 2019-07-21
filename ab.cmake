@@ -22,8 +22,9 @@ endforeach (child)
 # /childs ==============================================================================================================
 
 # include and sources:==================================================================================================
-list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 aux_source_directory(. CURRENT_SRCS)
+aux_source_directory(src CURRENT_SRCS)
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.cpp$")
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.c$")
 # /include and sources =================================================================================================
