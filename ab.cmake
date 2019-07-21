@@ -60,8 +60,14 @@ target_link_libraries(${PROJECT_NAME} ${FROM_CHILDS_LIBS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS})
 
 # install
-file(GLOB PROJ_HEADERS LIST_DIRECTORIES false ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS} *.h)
+## lib
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/lib)
+## headers
+file(GLOB PROJ_HEADERS LIST_DIRECTORIES false ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS} *.h)
 foreach (header ${PROJ_HEADERS})
     install(FILES ${header} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/include)
 endforeach (header)
+## sources
+foreach (src ${CURRENT_SRCS})
+    install(FILES ${src} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/src)
+endforeach (src)
