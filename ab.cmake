@@ -12,7 +12,7 @@ unset(CURRENT_SRCS)
 
 
 # childs: ==============================================================================================================
-foreach (child ${CHILDS})
+foreach (child ${ABC_CHILDS})
     add_subdirectory(${child})
     if (${ABCMAKELISTS_VER})
         list(APPEND FROM_CHILDS_INCDIRS ${CHILD_INCDIRS})
@@ -22,9 +22,11 @@ endforeach (child)
 # /childs ==============================================================================================================
 
 # include and sources:==================================================================================================
-list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR})
+if(ABC_USE_PROJECT_ROOT)
+    list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR})
+    aux_source_directory(. CURRENT_SRCS)
+endif()
 list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-aux_source_directory(. CURRENT_SRCS)
 aux_source_directory(src CURRENT_SRCS)
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.cpp$")
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.c$")

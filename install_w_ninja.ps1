@@ -1,4 +1,4 @@
-cd ..
+cd $PSScriptRoot/..
 cmake -G "Ninja" -S . -B ./build
 cd ./build
 ninja
