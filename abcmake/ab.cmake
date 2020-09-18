@@ -43,7 +43,7 @@ endif ()
 
 
 # output ===============================================================================================================
-message(STATUS "  PROJECT:  ${PROJECT_NAME} is loaded")
+message(STATUS "  PROJECT:  ${PROJECT_NAME}")
 message(STATUS "  SUBPROJECTS:  ${CHILDS}")
 message(STATUS "  =======================================")
 
@@ -55,17 +55,26 @@ if (CURRENT_SRCS)
     message(STATUS "    SOURSES:        ${CURRENT_SRCS}")
 endif ()
 
-message(STATUS "    Child Includes: ${FROM_CHILDS_INCDIRS}")
-message(STATUS "    Child Libs: ${FROM_CHILDS_LIBS}")
+if (FROM_CHILDS_INCDIRS)
+    message(STATUS "    Child Includes: ${FROM_CHILDS_INCDIRS}")
+endif ()
+
+if (FROM_CHILDS_LIBS)
+    message(STATUS "    Child Libs: ${FROM_CHILDS_LIBS}")
+endif ()
 
 # /output ==============================================================================================================
-add_library(${PROJECT_NAME} ${CURRENT_SRCS})
-target_link_libraries(${PROJECT_NAME} ${FROM_CHILDS_LIBS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS})
+if (CURRENT_SRCS)
+    add_library(${PROJECT_NAME} ${CURRENT_SRCS})
+    target_link_libraries(${PROJECT_NAME} ${FROM_CHILDS_LIBS})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${FROM_CHILDS_INCDIRS} ${CURRENT_INCDIRS})
+endif ()
 
 # install
 ## lib
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/lib)
+if (CURRENT_SRCS)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/lib)
+endif ()
 ## headers. collecting
 foreach (header_dir ${CURRENT_INCDIRS})
     file(GLOB HEADERS LIST_DIRECTORIES true ${header_dir}/*.h)
