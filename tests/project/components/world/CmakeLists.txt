@@ -4,4 +4,4 @@ include($ENV{ABCMAKE_PATH}/ab.cmake)
 
 project(World)
 add_library(${PROJECT_NAME})
-target_abcmake(${PROJECT_NAME})
+target_init_abcmake(${PROJECT_NAME})

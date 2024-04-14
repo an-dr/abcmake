@@ -69,7 +69,7 @@ endfunction()
 # *************************************************************************
 
 # Add to the project all files from ./src, ./include, ./lib
-function(target_abcmake TargetName)
+function(target_init_abcmake TargetName)
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
