@@ -1,8 +1,6 @@
-#include "hello.hpp"
-#include "world.hpp"
+#include "app.hpp"
 
 int main(){
-    hello();
-    world();
+    app();
     return 0;
 }
