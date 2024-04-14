@@ -1,5 +1,6 @@
 #include <stdio.h>
+#include "hello_consts.h"
 
 void hello(){
-    printf("Hello\n");
+    printf(HELLO_STR);
 }

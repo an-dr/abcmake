@@ -11,16 +11,29 @@
 # *************************************************************************
 
 set(ABCMAKE_VERSION_MAJOR 4)
-set(ABCMAKE_VERSION_MINOR 0)
+set(ABCMAKE_VERSION_MINOR 1)
 set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
+
 
 # *************************************************************************
 # Private functions
 # *************************************************************************
 
-function(_abc_AddProject Path )
-    add_subdirectory(${Path})
+function(_abc_AddProject Path OUT_ABCMAKE_VER)
+    if (EXISTS ${Path}/CMakeLists.txt)
+        message(DEBUG "Adding project ${Path}")
+        add_subdirectory(${Path})
+        
+        get_directory_property(version DIRECTORY ${Path} ABCMAKE_VERSION)
+        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
+        if (NOT version)
+            message (STATUS "  ❌ ${child} is not a ABCMAKE project. Handle it manually.")
+        endif()
+        
+    else()
+        message (STATUS "  📁 ${child} is not a CMake project")
+    endif()
 endfunction()
 
 # Add all projects from the lib subdirectory
@@ -32,15 +45,15 @@ function(_abc_AddComponents TargetName)
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
             message(DEBUG "${TargetName} found ${child}")
-            _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-            get_directory_property(is_abcmake DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_VERSION)
-            if (is_abcmake STREQUAL "")
-                message (STATUS "  ❌ ${child} is not a ABCMAKE project. Handle it manually.")
-            else()
+            
+            _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ver)
+            
+            if (ver)
                 get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_TARGETS)
                 message (STATUS "  ✅ Linking ${to_link} to ${TargetName}")
                 target_link_libraries(${TargetName} PRIVATE ${to_link})
             endif()
+            
         endif()
     endforeach()
     
