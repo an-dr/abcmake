@@ -8,6 +8,11 @@
 # site:    https://agramakov.me
 # e-mail:  mail@agramakov.me
 #
+# Andrei's Build CMake subsystem or abcmake is a CMake module to work 
+# with C/C++ project of a predefined standard structure in order to 
+# simplify the build process.
+# 
+# Source Code: https://github.com/an-dr/abcmake
 # *************************************************************************
 
 set(ABCMAKE_VERSION_MAJOR 4)
