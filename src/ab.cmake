@@ -24,20 +24,20 @@ function(_abc_AddProject Path )
 endfunction()
 
 # Add all projects from the lib subdirectory
-function(_abc_AddLibs TargetName)
+function(_abc_AddComponents TargetName)
     # List of possible subprojects
-    file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/lib ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)
+    file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/components ${CMAKE_CURRENT_SOURCE_DIR}/components/*)
     
     # Link all subprojects to the ${TargetName}
     foreach(child ${children})
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/${child})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
             message(DEBUG "${TargetName} found ${child}")
-            _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/lib/${child})
-            get_directory_property(is_abcmake DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/${child} ABCMAKE_VERSION)
+            _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
+            get_directory_property(is_abcmake DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_VERSION)
             if (is_abcmake STREQUAL "")
                 message (STATUS "  ❌ ${child} is not a ABCMAKE project. Handle it manually.")
             else()
-                get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/${child} ABCMAKE_TARGETS)
+                get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_TARGETS)
                 message (STATUS "  ✅ Linking ${to_link} to ${TargetName}")
                 target_link_libraries(${TargetName} PRIVATE ${to_link})
             endif()
@@ -86,7 +86,7 @@ function(target_init_abcmake TargetName)
                  ABCMAKE_TARGETS ${TargetName})
         
     _abc_AddFiles(${TargetName})
-    _abc_AddLibs(${TargetName})
+    _abc_AddComponents(${TargetName})
     _abc_Install(${TargetName})
 
 endfunction()
