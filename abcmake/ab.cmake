@@ -1,6 +1,6 @@
 # SETTINGS zone
 
-get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
 project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 14)
 set(ABCMAKELISTS_VER 3)
@@ -23,10 +23,10 @@ endforeach (child)
 
 # include and sources:==================================================================================================
 if(ABC_USE_PROJECT_ROOT)
-    list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR})
+    list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_LIST_DIR})
     aux_source_directory(. CURRENT_SRCS)
 endif()
-list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND CURRENT_INCDIRS ${CMAKE_CURRENT_LIST_DIR}/include)
 aux_source_directory(src CURRENT_SRCS)
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.cpp$")
 list(FILTER CURRENT_SRCS EXCLUDE REGEX ".*main.c$")
@@ -73,7 +73,7 @@ endif ()
 # install
 ## lib
 if (CURRENT_SRCS)
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/lib)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}_lib/lib)
 endif ()
 ## headers. collecting
 foreach (header_dir ${CURRENT_INCDIRS})
@@ -83,9 +83,9 @@ endforeach (header_dir)
 
 ## headers. install
 foreach (header ${PROJ_HEADERS})
-    install(FILES ${header} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/include)
+    install(FILES ${header} DESTINATION ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}_lib/include)
 endforeach (header)
 ## sources
 foreach (src ${CURRENT_SRCS})
-    install(FILES ${src} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_lib/src)
+    install(FILES ${src} DESTINATION ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}_lib/src)
 endforeach (src)
