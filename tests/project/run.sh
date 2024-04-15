@@ -21,16 +21,15 @@ function log { echo "- $1 [$(basename "$0")]" ;}
 
 pushd $SCRIPT_ROOT
 
-ls
-
 git_root=$(git rev-parse --show-toplevel)
 
 # Set the ABCMAKE_PATH environment variable
 export ABCMAKE_PATH="$git_root/src"
 
-echo Run CMake
+log Run CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 cmake --install build --config Release
+log Done
 
 popd
