@@ -1,0 +1,98 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+    ],
+    "settings": {},
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            // Cmake build
+            {
+                "label": "Configure",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S ."
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project",
+                    "env": {
+                        "ABCMAKE_PATH": "${workspaceFolder}/src"
+                    }
+                },
+                "problemMatcher": []
+            },
+            // Cmake build
+            {
+                "label": "Build",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "build",
+                    "--target",
+                    "all",
+                    "--config",
+                    "Release"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project"
+                },
+                "problemMatcher": [],
+            },
+            // Cmake clean
+            {
+                "label": "Clean",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "build",
+                    "--target",
+                    "clean"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project"
+                },
+                "problemMatcher": []
+            },
+            // Install to workspace/install
+            {
+                "label": "Install",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--install",
+                    "build",
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project",
+                },
+                "problemMatcher": [],
+            }
+        ]
+    }
+    
+}
