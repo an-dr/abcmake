@@ -16,7 +16,7 @@
 # *************************************************************************
 
 set(ABCMAKE_VERSION_MAJOR 4)
-set(ABCMAKE_VERSION_MINOR 1)
+set(ABCMAKE_VERSION_MINOR 2)
 set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
@@ -50,10 +50,11 @@ function(_abc_AddComponents TargetName)
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
         
+            set (ver "")
             _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ver)
         
             if (ver)
-                message(STATUS "${TargetName} found ${child} [abcmake v${ver}]")
+                message(DEBUG "${TargetName} found ${child} [abcmake v${ver}]")
             
                 get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_TARGETS)
                 message (STATUS "  ✅ Linking ${to_link} to ${TargetName}")
@@ -110,7 +111,7 @@ function(target_init_abcmake TargetName)
 
 endfunction()
 
-function (target_add_abcmake_component TARGETNAME COMPONENTPATH)
+function (target_abcmake_component TARGETNAME COMPONENTPATH)
     _abc_AddProject(${COMPONENTPATH} ver)
     
     if (ver)
@@ -118,5 +119,11 @@ function (target_add_abcmake_component TARGETNAME COMPONENTPATH)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
+endfunction()
+
+function(target_sources_directory TARGETNAME SOURCE_DIR)
+    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
+    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
+    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
 endfunction()
 
