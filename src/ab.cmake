@@ -33,11 +33,11 @@ function(_abc_AddProject Path OUT_ABCMAKE_VER)
         get_directory_property(version DIRECTORY ${Path} ABCMAKE_VERSION)
         set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
         if (NOT version)
-            message (STATUS "  ❌ ${child} is not a ABCMAKE project. Handle it manually.")
+            message (STATUS "  ❌ ${Path} is not an ABCMAKE project. Handle it manually.")
         endif()
         
     else()
-        message (STATUS "  📁 ${child} is not a CMake project")
+        message (STATUS "  📁 ${Path} is not a CMake project")
     endif()
 endfunction()
 
@@ -49,11 +49,12 @@ function(_abc_AddComponents TargetName)
     # Link all subprojects to the ${TargetName}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-            message(DEBUG "${TargetName} found ${child}")
-            
+        
             _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ver)
-            
+        
             if (ver)
+                message(STATUS "${TargetName} found ${child} [abcmake v${ver}]")
+            
                 get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_TARGETS)
                 message (STATUS "  ✅ Linking ${to_link} to ${TargetName}")
                 target_link_libraries(${TargetName} PRIVATE ${to_link})
@@ -108,3 +109,14 @@ function(target_init_abcmake TargetName)
     _abc_Install(${TargetName})
 
 endfunction()
+
+function (target_add_abcmake_component TARGETNAME COMPONENTPATH)
+    _abc_AddProject(${COMPONENTPATH} ver)
+    
+    if (ver)
+        get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
+        message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
+        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
+    endif()
+endfunction()
+
