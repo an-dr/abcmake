@@ -7,7 +7,7 @@ $env:ABCMAKE_PATH = "$git_root/src"
 
 echo "🚀 Building project"
 
-cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DCMAKE_BUILD_TYPE=Release -G "Ninja"
 cmake --build build --config Release
 cmake --install build --config Release
 

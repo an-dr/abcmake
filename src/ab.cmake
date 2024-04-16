@@ -49,44 +49,23 @@ function(_abc_AddComponents TargetName)
     # Link all subprojects to the ${TargetName}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-        
-            set (ver "")
-            _abc_AddProject(${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ver)
-        
-            if (ver)
-                message(DEBUG "${TargetName} found ${child} [abcmake v${ver}]")
-            
-                get_directory_property(to_link DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child} ABCMAKE_TARGETS)
-                message (STATUS "  ✅ Linking ${to_link} to ${TargetName}")
-                target_link_libraries(${TargetName} PRIVATE ${to_link})
-            endif()
-            
+            target_abcmake_component(${TargetName} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
         endif()
     endforeach()
     
 endfunction()
 
-# Add files from the ./src, ./include, ./lib to the project
-function(_abc_AddFiles TargetName)
-    file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
-    message( DEBUG "${TargetName} sources: ${SOURCES}")
-    target_sources(${TargetName} PRIVATE ${SOURCES})
-    message( DEBUG "${TargetName} include: ${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_include_directories(${TargetName} PUBLIC include)
-endfunction()
-
-function(_abc_Install TargetName)
-    # install directory
-    # if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-        set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
-        CACHE PATH "default install path" FORCE)
-    # endif()
-    install(TARGETS ${TargetName} DESTINATION ".")
-endfunction()
 
 # *************************************************************************
 # Public functions
 # *************************************************************************
+
+# Add all source files from the specified directory to the target
+function(target_sources_directory TARGETNAME SOURCE_DIR)
+    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
+    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
+    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+endfunction()
 
 # Add to the project all files from ./src, ./include, ./lib
 function(target_init_abcmake TargetName)
@@ -105,15 +84,15 @@ function(target_init_abcmake TargetName)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
                  ABCMAKE_TARGETS ${TargetName})
         
-    _abc_AddFiles(${TargetName})
+    target_sources_directory(${TargetName} "src")
+    target_include_directories(${TargetName} PUBLIC "include")
     _abc_AddComponents(${TargetName})
-    _abc_Install(${TargetName})
+    target_install_near_build(${TargetName})
 
 endfunction()
 
 function (target_abcmake_component TARGETNAME COMPONENTPATH)
     _abc_AddProject(${COMPONENTPATH} ver)
-    
     if (ver)
         get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
@@ -121,9 +100,12 @@ function (target_abcmake_component TARGETNAME COMPONENTPATH)
     endif()
 endfunction()
 
-function(target_sources_directory TARGETNAME SOURCE_DIR)
-    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
-    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
-    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
-endfunction()
 
+function(target_install_near_build TARGETNAME)
+    # install directory
+    # if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
+        CACHE PATH "default install path" FORCE)
+    # endif()
+    install(TARGETS ${TARGETNAME} DESTINATION ".")
+endfunction()
