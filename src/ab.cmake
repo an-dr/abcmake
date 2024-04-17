@@ -15,8 +15,8 @@
 # Source Code: https://github.com/an-dr/abcmake
 # *************************************************************************
 
-set(ABCMAKE_VERSION_MAJOR 4)
-set(ABCMAKE_VERSION_MINOR 2)
+set(ABCMAKE_VERSION_MAJOR 5)
+set(ABCMAKE_VERSION_MINOR 0)
 set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
@@ -34,11 +34,11 @@ function(_abc_AddProject PATH OUT_ABCMAKE_VER)
         get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
         set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
         if (NOT version)
-            message (STATUS "  ❌ ${PATH} is not an ABCMAKE project. Handle it manually.")
+            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
         endif()
         
     else()
-        message (STATUS "  📁 ${PATH} is not a CMake project")
+        message (STATUS "  ❌ ${PATH} is not a CMake project")
     endif()
 endfunction()
 
@@ -52,7 +52,7 @@ function(_abc_AddComponents TARGETNAME)
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-            target_abcmake_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
+            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
         endif()
     endforeach()
     
@@ -61,23 +61,12 @@ endfunction()
 
 # Install the target near the build directory
 # @param TARGETNAME - name of the target to install
-function(_target_install_near_build TARGETNAME)
+# @param DESTINATION - path to the destination directory inside the install dir
+function(_target_install_near_build TARGETNAME DESTINATION)
     # install directory
     set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
          CACHE PATH "default install path" FORCE)
-    install(TARGETS ${TARGETNAME} DESTINATION ".")
-endfunction()
-
-# *************************************************************************
-# Public functions
-# *************************************************************************
-
-# Add all source files from the specified directory to the target
-# @param TARGETNAME - name of the target to add sources
-function(target_sources_directory TARGETNAME SOURCE_DIR)
-    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
-    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
-    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+    install(TARGETS ${TARGETNAME} DESTINATION ${DESTINATION})
 endfunction()
 
 
@@ -85,7 +74,7 @@ endfunction()
 # @param TARGETNAME - name of the target to initialize
 # @param INCLUDE_DIR - path to the include directory
 # @param SOURCE_DIR - path to the source directory
-function(target_init_abcmake_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
+function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
@@ -104,21 +93,27 @@ function(target_init_abcmake_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
     target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
     target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
     _abc_AddComponents(${TARGETNAME})
-    _target_install_near_build(${TARGETNAME})
 
 endfunction()
 
+# *************************************************************************
+# Public functions
+# *************************************************************************
 
-function(target_init_abcmake TARGETNAME)
-    target_init_abcmake_custom(${TARGETNAME} 
-                               ${CMAKE_CURRENT_SOURCE_DIR}/include 
-                               ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# Add all source files from the specified directory to the target
+# @param TARGETNAME - name of the target to add sources
+function(target_sources_directory TARGETNAME SOURCE_DIR)
+    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
+    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
+    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
 endfunction()
 
-# Link the target to the component
+
+
+# Link the component to the target
 # @param TARGETNAME - name of the target for linking
 # @param COMPONENTPATH - path to the component to link
-function (target_abcmake_component TARGETNAME COMPONENTPATH)
+function (target_link_component TARGETNAME COMPONENTPATH)
     _abc_AddProject(${COMPONENTPATH} ver)
     if (ver)
         get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
@@ -126,3 +121,29 @@ function (target_abcmake_component TARGETNAME COMPONENTPATH)
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
 endfunction()
+
+function(add_main_component TARGETNAME)
+    add_executable(${TARGETNAME})
+    _target_init_abcmake(${TARGETNAME} "include" "src")
+    _target_install_near_build(${TARGETNAME} ".")
+endfunction()
+
+function(add_main_component_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
+    add_executable(${TARGETNAME})
+    _target_init_abcmake(${TARGETNAME} ${INCLUDE_DIR} ${SOURCE_DIR})
+    _target_install_near_build(${TARGETNAME} ".")
+endfunction()
+
+function(add_component TARGETNAME)
+    add_library(${TARGETNAME} STATIC)
+    _target_init_abcmake(${TARGETNAME} "include" "src")
+    _target_install_near_build(${TARGETNAME} "lib")
+endfunction()
+
+function(add_component_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
+    add_library(${TARGETNAME} STATIC)
+    _target_init_abcmake(${TARGETNAME} ${INCLUDE_DIR} ${SOURCE_DIR})
+    _target_install_near_build(${TARGETNAME} "lib")
+endfunction()
+
+
