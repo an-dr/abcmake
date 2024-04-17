@@ -10,7 +10,7 @@
         "tasks": [
             // Cmake build
             {
-                "label": "Configure",
+                "label": "project: Configure",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -34,7 +34,7 @@
             },
             // Cmake build
             {
-                "label": "Build",
+                "label": "project: Build",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -54,29 +54,9 @@
                 },
                 "problemMatcher": [],
             },
-            // Cmake clean
-            {
-                "label": "Clean",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--build",
-                    "build",
-                    "--target",
-                    "clean"
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/project"
-                },
-                "problemMatcher": []
-            },
             // Install to workspace/install
             {
-                "label": "Install",
+                "label": "project: Install",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -89,6 +69,69 @@
                 },
                 "options": {
                     "cwd": "${workspaceFolder}/tests/project",
+                },
+                "problemMatcher": [],
+            }
+            {
+                "label": "project_custom: Configure",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S ."
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project_custom",
+                    "env": {
+                        "ABCMAKE_PATH": "${workspaceFolder}/src"
+                    }
+                },
+                "problemMatcher": []
+            },
+            // Cmake build
+            {
+                "label": "project_custom: Build",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "build",
+                    "--target",
+                    "all",
+                    "--config",
+                    "Release"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project_custom"
+                },
+                "problemMatcher": [],
+            },
+            // Install to workspace/install
+            {
+                "label": "project_custom: Install",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--install",
+                    "build",
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/project_custom",
                 },
                 "problemMatcher": [],
             }
