@@ -122,27 +122,55 @@ function (target_link_component TARGETNAME COMPONENTPATH)
     endif()
 endfunction()
 
+# Add an executable component to the project
+# @param TARGETNAME - name of the target to add the component
+# @param INCLUDE_DIR - path to the include directory
+# @param SOURCE_DIR - path to the source directory
 function(add_main_component TARGETNAME)
+    set(flags)
+    set(args)
+    set(listArgs INCLUDE_DIR SOURCE_DIR)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    
+    if (NOT arg_SOURCE_DIR)
+        set(arg_SOURCE_DIR "src")
+    endif()
+    
+    if (NOT arg_INCLUDE_DIR)
+        set(arg_INCLUDE_DIR "include")
+    endif()
+    
     add_executable(${TARGETNAME})
-    _target_init_abcmake(${TARGETNAME} "include" "src")
+    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} ".")
 endfunction()
 
-function(add_main_component_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
-    add_executable(${TARGETNAME})
-    _target_init_abcmake(${TARGETNAME} ${INCLUDE_DIR} ${SOURCE_DIR})
-    _target_install_near_build(${TARGETNAME} ".")
-endfunction()
-
+# Add a shared or static library component to the project
+# @param TARGETNAME - name of the target to add the component
+# @param INCLUDE_DIR - path to the include directory
+# @param SOURCE_DIR - path to the source directory
+# @param SHARED - if set to TRUE, the library will be shared
 function(add_component TARGETNAME)
-    add_library(${TARGETNAME} STATIC)
-    _target_init_abcmake(${TARGETNAME} "include" "src")
-    _target_install_near_build(${TARGETNAME} "lib")
-endfunction()
+    set(flags SHARED)
+    set(args)
+    set(listArgs INCLUDE_DIR SOURCE_DIR)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
 
-function(add_component_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
-    add_library(${TARGETNAME} STATIC)
-    _target_init_abcmake(${TARGETNAME} ${INCLUDE_DIR} ${SOURCE_DIR})
+    if (NOT arg_SOURCE_DIR)
+        set(arg_SOURCE_DIR "src")
+    endif()
+
+    if (NOT arg_INCLUDE_DIR)
+        set(arg_INCLUDE_DIR "include")
+    endif()
+
+    if (arg_SHARED)
+        add_library(${TARGETNAME} SHARED)
+    else()
+        add_library(${TARGETNAME} STATIC)
+    endif()
+    
+    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} "lib")
 endfunction()
 

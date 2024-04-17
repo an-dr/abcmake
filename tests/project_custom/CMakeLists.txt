@@ -4,7 +4,9 @@ include($ENV{ABCMAKE_PATH}/ab.cmake)
 
 project(HelloWorld)
 
-add_main_component_custom(${PROJECT_NAME} "./includes" "./sources")
+add_main_component(${PROJECT_NAME} 
+                   INCLUDE_DIR "./includes" 
+                   SOURCE_DIR "./sources")
 
 target_link_component(${PROJECT_NAME} ./lib_world)
 target_link_component(${PROJECT_NAME} ./lib_exclamation)
