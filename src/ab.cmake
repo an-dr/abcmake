@@ -20,6 +20,7 @@ set(ABCMAKE_VERSION_MINOR 2)
 set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
+include(CMakeParseArguments)
 
 # *************************************************************************
 # Private functions
@@ -73,7 +74,9 @@ endfunction()
 
 # Add to the project all files from ./src, ./include, ./lib
 # @param TARGETNAME - name of the target to initialize
-function(target_init_abcmake TARGETNAME)
+# @param INCLUDE_DIR - path to the include directory
+# @param SOURCE_DIR - path to the source directory
+function(target_init_abcmake_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
@@ -89,13 +92,19 @@ function(target_init_abcmake TARGETNAME)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
                  ABCMAKE_TARGETS ${TARGETNAME})
         
-    target_sources_directory(${TARGETNAME} "src")
-    target_include_directories(${TARGETNAME} PUBLIC "include")
+    target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
+    target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
     _abc_AddComponents(${TARGETNAME})
     target_install_near_build(${TARGETNAME})
 
 endfunction()
 
+
+function(target_init_abcmake TARGETNAME)
+    target_init_abcmake_custom(${TARGETNAME} 
+                               ${CMAKE_CURRENT_SOURCE_DIR}/include 
+                               ${CMAKE_CURRENT_SOURCE_DIR}/src)
+endfunction()
 
 # Link the target to the component
 # @param TARGETNAME - name of the target for linking
