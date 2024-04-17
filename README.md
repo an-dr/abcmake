@@ -50,7 +50,7 @@ add_main_component(${PROJECT_NAME})
 ## Public Functions
 
 - `add_main_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR])` - Add the executable component. It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively.
-- `add_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR])` - Add a component as a library
+- `add_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR SHARED])` - Add a component as a library
 - `target_link_component (TARGETNAME COMPONENTPATH)` - Add a component to the target
 - `target_sources_directory(TARGETNAME SOURCE_DIR)` - Add all sources from the directory
 
