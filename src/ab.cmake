@@ -25,31 +25,33 @@ set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE
 # Private functions
 # *************************************************************************
 
-function(_abc_AddProject Path OUT_ABCMAKE_VER)
-    if (EXISTS ${Path}/CMakeLists.txt)
-        message(DEBUG "Adding project ${Path}")
-        add_subdirectory(${Path})
+function(_abc_AddProject PATH OUT_ABCMAKE_VER)
+    if (EXISTS ${PATH}/CMakeLists.txt)
+        message(DEBUG "Adding project ${PATH}")
+        add_subdirectory(${PATH})
         
-        get_directory_property(version DIRECTORY ${Path} ABCMAKE_VERSION)
+        get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
         set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
         if (NOT version)
-            message (STATUS "  ❌ ${Path} is not an ABCMAKE project. Handle it manually.")
+            message (STATUS "  ❌ ${PATH} is not an ABCMAKE project. Handle it manually.")
         endif()
         
     else()
-        message (STATUS "  📁 ${Path} is not a CMake project")
+        message (STATUS "  📁 ${PATH} is not a CMake project")
     endif()
 endfunction()
 
-# Add all projects from the lib subdirectory
-function(_abc_AddComponents TargetName)
+
+# Add all projects from the components subdirectory
+# @param TARGETNAME - name of the target to add components
+function(_abc_AddComponents TARGETNAME)
     # List of possible subprojects
     file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/components ${CMAKE_CURRENT_SOURCE_DIR}/components/*)
     
-    # Link all subprojects to the ${TargetName}
+    # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-            target_abcmake_component(${TargetName} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
+            target_abcmake_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
         endif()
     endforeach()
     
@@ -61,19 +63,22 @@ endfunction()
 # *************************************************************************
 
 # Add all source files from the specified directory to the target
+# @param TARGETNAME - name of the target to add sources
 function(target_sources_directory TARGETNAME SOURCE_DIR)
     file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
     message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
     target_sources(${TARGETNAME} PRIVATE ${SOURCES})
 endfunction()
 
+
 # Add to the project all files from ./src, ./include, ./lib
-function(target_init_abcmake TargetName)
+# @param TARGETNAME - name of the target to initialize
+function(target_init_abcmake TARGETNAME)
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
     if (NOT hasParent)
-        message(STATUS "🔤 ${TargetName}")
+        message(STATUS "🔤 ${TARGETNAME}")
     endif ()
     
     # Report version
@@ -82,15 +87,19 @@ function(target_init_abcmake TargetName)
                  
     # Add target to the target list
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
-                 ABCMAKE_TARGETS ${TargetName})
+                 ABCMAKE_TARGETS ${TARGETNAME})
         
-    target_sources_directory(${TargetName} "src")
-    target_include_directories(${TargetName} PUBLIC "include")
-    _abc_AddComponents(${TargetName})
-    target_install_near_build(${TargetName})
+    target_sources_directory(${TARGETNAME} "src")
+    target_include_directories(${TARGETNAME} PUBLIC "include")
+    _abc_AddComponents(${TARGETNAME})
+    target_install_near_build(${TARGETNAME})
 
 endfunction()
 
+
+# Link the target to the component
+# @param TARGETNAME - name of the target for linking
+# @param COMPONENTPATH - path to the component to link
 function (target_abcmake_component TARGETNAME COMPONENTPATH)
     _abc_AddProject(${COMPONENTPATH} ver)
     if (ver)
@@ -101,11 +110,11 @@ function (target_abcmake_component TARGETNAME COMPONENTPATH)
 endfunction()
 
 
+# Install the target near the build directory
+# @param TARGETNAME - name of the target to install
 function(target_install_near_build TARGETNAME)
     # install directory
-    # if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-        set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
-        CACHE PATH "default install path" FORCE)
-    # endif()
+    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
+         CACHE PATH "default install path" FORCE)
     install(TARGETS ${TARGETNAME} DESTINATION ".")
 endfunction()
