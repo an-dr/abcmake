@@ -59,6 +59,15 @@ function(_abc_AddComponents TARGETNAME)
 endfunction()
 
 
+# Install the target near the build directory
+# @param TARGETNAME - name of the target to install
+function(_target_install_near_build TARGETNAME)
+    # install directory
+    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
+         CACHE PATH "default install path" FORCE)
+    install(TARGETS ${TARGETNAME} DESTINATION ".")
+endfunction()
+
 # *************************************************************************
 # Public functions
 # *************************************************************************
@@ -95,7 +104,7 @@ function(target_init_abcmake_custom TARGETNAME INCLUDE_DIR SOURCE_DIR)
     target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
     target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
     _abc_AddComponents(${TARGETNAME})
-    target_install_near_build(${TARGETNAME})
+    _target_install_near_build(${TARGETNAME})
 
 endfunction()
 
@@ -116,14 +125,4 @@ function (target_abcmake_component TARGETNAME COMPONENTPATH)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
-endfunction()
-
-
-# Install the target near the build directory
-# @param TARGETNAME - name of the target to install
-function(target_install_near_build TARGETNAME)
-    # install directory
-    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
-         CACHE PATH "default install path" FORCE)
-    install(TARGETS ${TARGETNAME} DESTINATION ".")
 endfunction()
