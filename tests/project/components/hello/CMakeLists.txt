@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+project(Hello)
 
 include($ENV{ABCMAKE_PATH}/ab.cmake)
-
-project(Hello)
-add_library(${PROJECT_NAME})
-target_init_abcmake(${PROJECT_NAME})
+add_component(${PROJECT_NAME})
