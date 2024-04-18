@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(HelloWorld)
 
 include($ENV{ABCMAKE_PATH}/ab.cmake)
