@@ -33,3 +33,6 @@ jobs:
       
     - name: Gen compile_commands.json
       run: bash ./tests/test_compile_commands/run.sh
+      
+    - name: Release Updated
+      run: python ./tests/test_release_updated.py
