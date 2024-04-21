@@ -8,6 +8,21 @@
     "tasks": {
         "version": "2.0.0",
         "tasks": [
+            // run scripts\generate_release.py
+            {
+                "label": "generate_release",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "scripts/generate_release.py"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "problemMatcher": []
+                
+            },
             // Cmake build
             {
                 "label": "project: Configure",
