@@ -23,16 +23,13 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Simple Project - Build and Install
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: bash ./tests/project/run.sh
       
     - name: Project with Custom Folders - Build and Install
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: bash ./tests/project_custom/run.sh
       
     - name: Project with Component Interconnections
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: bash ./tests/test_interdep/run.sh
+      
+    - name: Gen compile_commands.json
+      run: bash ./tests/test_compile_commands/run.sh
