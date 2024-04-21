@@ -17,56 +17,17 @@
 
 set(ABCMAKE_VERSION_MAJOR 5)
 set(ABCMAKE_VERSION_MINOR 1)
-set(ABCMAKE_VERSION_PATCH 1)
+set(ABCMAKE_VERSION_PATCH 2)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
 
 # Configure CMake
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# ==============================================================================
+# add_component.cmake ==========================================================
+
 include(CMakeParseArguments)
-
-# *************************************************************************
-# Private functions
-# *************************************************************************
-
-# Add subdirectory to the project only if not added
-function(_add_subdirectory PATH)
-
-    # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
-    get_property(projects GLOBAL PROPERTY ABCMAKE_ADDED_PROJECTS)
-    
-    # Resolve relative path
-    get_filename_component(PATH "${PATH}" ABSOLUTE)
-    
-    if (NOT PATH IN_LIST projects)
-        # Add PATH to the global list
-        set_property(GLOBAL APPEND PROPERTY ABCMAKE_ADDED_PROJECTS ${PATH})
-        
-        # Use the last directory name for a binary directory name 
-        get_filename_component(last_dir "${PATH}" NAME)
-        add_subdirectory(${PATH} abc_${last_dir})
-    endif()
-    
-endfunction()
-
-
-function(_abc_AddProject PATH OUT_ABCMAKE_VER)
-    if (EXISTS ${PATH}/CMakeLists.txt)
-        message(DEBUG "Adding project ${PATH}")
-        _add_subdirectory(${PATH})
-        
-        get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
-        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
-        if (NOT version)
-            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
-        endif()
-        
-    else()
-        message (STATUS "  ❌ ${PATH} is not a CMake project")
-    endif()
-endfunction()
-
 
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
@@ -121,32 +82,6 @@ function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
 
 endfunction()
 
-
-# *************************************************************************
-# Public functions
-# *************************************************************************
-
-# Add all source files from the specified directory to the target
-# @param TARGETNAME - name of the target to add sources
-function(target_sources_directory TARGETNAME SOURCE_DIR)
-    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
-    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
-    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
-endfunction()
-
-
-# Link the component to the target
-# @param TARGETNAME - name of the target for linking
-# @param COMPONENTPATH - path to the component to link
-function (target_link_component TARGETNAME COMPONENTPATH)
-    _abc_AddProject(${COMPONENTPATH} ver)
-    if (ver)
-        get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
-        message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
-        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
-    endif()
-endfunction()
-
 # Add an executable component to the project
 # @param TARGETNAME - name of the target to add the component
 # @param INCLUDE_DIR - path to the include directory
@@ -198,3 +133,77 @@ function(add_component TARGETNAME)
     _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} "lib")
 endfunction()
+
+
+# add_component.cmake ==========================================================
+# ==============================================================================
+
+
+# ==============================================================================
+# target_sources_directory.cmake ===============================================
+
+# Add all source files from the specified directory to the target
+# @param TARGETNAME - name of the target to add sources
+function(target_sources_directory TARGETNAME SOURCE_DIR)
+    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
+    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
+    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+endfunction()
+
+# target_sources_directory.cmake ===============================================
+# ==============================================================================
+
+# ==============================================================================
+# target_link_component.cmake ==================================================
+
+# Add subdirectory to the project only if not added
+function(_add_subdirectory PATH)
+
+    # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
+    get_property(projects GLOBAL PROPERTY ABCMAKE_ADDED_PROJECTS)
+    
+    # Resolve relative path
+    get_filename_component(PATH "${PATH}" ABSOLUTE)
+    
+    if (NOT PATH IN_LIST projects)
+        # Add PATH to the global list
+        set_property(GLOBAL APPEND PROPERTY ABCMAKE_ADDED_PROJECTS ${PATH})
+        
+        # Use the last directory name for a binary directory name 
+        get_filename_component(last_dir "${PATH}" NAME)
+        add_subdirectory(${PATH} abc_${last_dir})
+    endif()
+    
+endfunction()
+
+function(_abc_AddProject PATH OUT_ABCMAKE_VER)
+    if (EXISTS ${PATH}/CMakeLists.txt)
+        message(DEBUG "Adding project ${PATH}")
+        _add_subdirectory(${PATH})
+        
+        get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
+        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
+        if (NOT version)
+            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
+        endif()
+        
+    else()
+        message (STATUS "  ❌ ${PATH} is not a CMake project")
+    endif()
+endfunction()
+
+# Link the component to the target
+# @param TARGETNAME - name of the target for linking
+# @param COMPONENTPATH - path to the component to link
+function (target_link_component TARGETNAME COMPONENTPATH)
+    _abc_AddProject(${COMPONENTPATH} ver)
+    if (ver)
+        get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
+        message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
+        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
+    endif()
+endfunction()
+
+# target_link_component.cmake ==================================================
+# ==============================================================================
+

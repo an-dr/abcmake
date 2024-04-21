@@ -1,40 +1,7 @@
-# Add subdirectory to the project only if not added
-function(_add_subdirectory PATH)
+# ==============================================================================
+# add_component.cmake ==========================================================
 
-    # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
-    get_property(projects GLOBAL PROPERTY ABCMAKE_ADDED_PROJECTS)
-    
-    # Resolve relative path
-    get_filename_component(PATH "${PATH}" ABSOLUTE)
-    
-    if (NOT PATH IN_LIST projects)
-        # Add PATH to the global list
-        set_property(GLOBAL APPEND PROPERTY ABCMAKE_ADDED_PROJECTS ${PATH})
-        
-        # Use the last directory name for a binary directory name 
-        get_filename_component(last_dir "${PATH}" NAME)
-        add_subdirectory(${PATH} abc_${last_dir})
-    endif()
-    
-endfunction()
-
-
-function(_abc_AddProject PATH OUT_ABCMAKE_VER)
-    if (EXISTS ${PATH}/CMakeLists.txt)
-        message(DEBUG "Adding project ${PATH}")
-        _add_subdirectory(${PATH})
-        
-        get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
-        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
-        if (NOT version)
-            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
-        endif()
-        
-    else()
-        message (STATUS "  ❌ ${PATH} is not a CMake project")
-    endif()
-endfunction()
-
+include(CMakeParseArguments)
 
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
@@ -88,3 +55,60 @@ function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
     _abc_AddComponents(${TARGETNAME})
 
 endfunction()
+
+# Add an executable component to the project
+# @param TARGETNAME - name of the target to add the component
+# @param INCLUDE_DIR - path to the include directory
+# @param SOURCE_DIR - path to the source directory
+function(add_main_component TARGETNAME)
+    set(flags)
+    set(args)
+    set(listArgs INCLUDE_DIR SOURCE_DIR)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    
+    if (NOT arg_SOURCE_DIR)
+        set(arg_SOURCE_DIR "src")
+    endif()
+    
+    if (NOT arg_INCLUDE_DIR)
+        set(arg_INCLUDE_DIR "include")
+    endif()
+    
+    add_executable(${TARGETNAME})
+    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
+    _target_install_near_build(${TARGETNAME} ".")
+endfunction()
+
+# Add a shared or static library component to the project
+# @param TARGETNAME - name of the target to add the component
+# @param INCLUDE_DIR - path to the include directory
+# @param SOURCE_DIR - path to the source directory
+# @param SHARED - if set to TRUE, the library will be shared
+function(add_component TARGETNAME)
+    set(flags SHARED)
+    set(args)
+    set(listArgs INCLUDE_DIR SOURCE_DIR)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+
+    if (NOT arg_SOURCE_DIR)
+        set(arg_SOURCE_DIR "src")
+    endif()
+
+    if (NOT arg_INCLUDE_DIR)
+        set(arg_INCLUDE_DIR "include")
+    endif()
+
+    if (arg_SHARED)
+        add_library(${TARGETNAME} SHARED)
+    else()
+        add_library(${TARGETNAME} STATIC)
+    endif()
+    
+    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
+    _target_install_near_build(${TARGETNAME} "lib")
+endfunction()
+
+
+# add_component.cmake ==========================================================
+# ==============================================================================
+
