@@ -20,6 +20,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/version.cmake)
 # Configure CMake
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/set_abcmake_config.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/add_component.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/target_sources_directory.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/target_link_component.cmake)
