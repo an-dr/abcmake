@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.15.0)
 project("exclamation")
 
 # Library
-add_library(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PRIVATE "src/exclamation.cpp")
-target_include_directories(${PROJECT_NAME} PUBLIC "include")
+
+include($ENV{ABCMAKE_PATH}/ab.cmake)
+add_component(${PROJECT_NAME} 
+              INCLUDE_DIR "./interface" 
+              SOURCE_DIR "./source_code")
