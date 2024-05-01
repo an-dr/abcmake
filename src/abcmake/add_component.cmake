@@ -6,6 +6,7 @@ include(CMakeParseArguments)
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
 function(_abc_AddComponents TARGETNAME)
+
     # List of possible subprojects
     file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${ABC_COMPONENTS_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${ABC_COMPONENTS_DIR}/*)
     
@@ -43,11 +44,10 @@ function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
     endif ()
     
     # Report version
-    set_directory_properties(ABCMAKE_VERSION ${ABCMAKE_VERSION})
+    _set_abcprop_curdir("VERSION" ${ABCMAKE_VERSION})
                  
     # Add target to the target list
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY 
-                 BCMAKE_TARGETS ${TARGETNAME})
+    _append_abcprop_curdir("TARGETS" ${TARGETNAME})
         
     target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
     target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
@@ -110,4 +110,3 @@ endfunction()
 
 # add_component.cmake ==========================================================
 # ==============================================================================
-

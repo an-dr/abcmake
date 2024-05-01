@@ -5,15 +5,14 @@
 function(_add_subdirectory PATH)
 
     # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
-    # get_cmake_property()
-    get_property(projects GLOBAL PROPERTY ABCMAKE_ADDED_PROJECTS)
+    _get_abcprop("ADDED_PROJECTS" projects)
     
     # Resolve relative path
     get_filename_component(PATH "${PATH}" ABSOLUTE)
     
     if (NOT PATH IN_LIST projects)
         # Add PATH to the global list
-        set_property(GLOBAL APPEND PROPERTY ABCMAKE_ADDED_PROJECTS ${PATH})
+        _set_abcprop("ADDED_PROJECTS" ${PATH})
         
         # Use the last directory name for a binary directory name 
         get_filename_component(last_dir "${PATH}" NAME)
@@ -27,7 +26,7 @@ function(_abc_AddProject PATH OUT_ABCMAKE_VER)
         message(DEBUG "Adding project ${PATH}")
         _add_subdirectory(${PATH})
         
-        get_directory_property(version DIRECTORY ${PATH} ABCMAKE_VERSION)
+        _get_abcprop_dir(${PATH} "VERSION" version)
         set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
         if (NOT version)
             message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
@@ -44,7 +43,7 @@ endfunction()
 function (target_link_component TARGETNAME COMPONENTPATH)
     _abc_AddProject(${COMPONENTPATH} ver)
     if (ver)
-        get_directory_property(to_link DIRECTORY ${COMPONENTPATH} ABCMAKE_TARGETS)
+        _get_abcprop_dir(${COMPONENTPATH} "TARGETS" to_link)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
