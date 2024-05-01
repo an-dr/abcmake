@@ -36,9 +36,8 @@
                 "problemMatcher": []
                 
             },
-            // Cmake build
             {
-                "label": "project: Configure",
+                "label": "project_custom: Configure",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -53,7 +52,7 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project",
+                    "cwd": "${workspaceFolder}/tests/project_custom",
                     "env": {
                         "ABCMAKE_PATH": "${workspaceFolder}/src"
                     }
@@ -62,7 +61,7 @@
             },
             // Cmake build
             {
-                "label": "project: Build",
+                "label": "project_custom: Build",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -78,13 +77,13 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project"
+                    "cwd": "${workspaceFolder}/tests/project_custom"
                 },
                 "problemMatcher": [],
             },
             // Install to workspace/install
             {
-                "label": "project: Install",
+                "label": "project_custom: Install",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -96,70 +95,7 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project",
-                },
-                "problemMatcher": [],
-            },
-            {
-                "label": "test_interdep: Configure",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "-G",
-                    "Ninja",
-                    "-B",
-                    "build",
-                    "-S ."
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/test_interdep",
-                    "env": {
-                        "ABCMAKE_PATH": "${workspaceFolder}/src"
-                    }
-                },
-                "problemMatcher": []
-            },
-            // Cmake build
-            {
-                "label": "test_interdep: Build",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--build",
-                    "build",
-                    "--target",
-                    "all",
-                    "--config",
-                    "Release"
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/test_interdep"
-                },
-                "problemMatcher": [],
-            },
-            // Install to workspace/install
-            {
-                "label": "test_interdep: Install",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--install",
-                    "build",
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/test_interdep",
+                    "cwd": "${workspaceFolder}/tests/project_custom",
                 },
                 "problemMatcher": [],
             }
