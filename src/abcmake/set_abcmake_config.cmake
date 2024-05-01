@@ -1,10 +1,5 @@
-
-set(ABC_COMPONENTS_DIR "components")
-set(ABC_SRC_DIR "src")
-set(ABC_INCLUDE_DIR "include")
-set(ABC_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
-set(ABC_INSTALL_LIB_SUBDIR "lib")
-set(ABC_INSTALL_EXE_SUBDIR ".")
+# ==============================================================================
+# set_abcmake_config.cmake =====================================================
 
 function (set_abcmake_config)
     set(flags SHARED)
@@ -42,3 +37,6 @@ function (set_abcmake_config)
     endif()
     
 endfunction()
+
+# set_abcmake_config.cmake =====================================================
+# ==============================================================================

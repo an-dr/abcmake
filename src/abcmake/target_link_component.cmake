@@ -5,6 +5,7 @@
 function(_add_subdirectory PATH)
 
     # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
+    # get_cmake_property()
     get_property(projects GLOBAL PROPERTY ABCMAKE_ADDED_PROJECTS)
     
     # Resolve relative path

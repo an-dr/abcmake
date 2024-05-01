@@ -43,12 +43,11 @@ function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
     endif ()
     
     # Report version
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY 
-                 ABCMAKE_VERSION ${ABCMAKE_VERSION})
+    set_directory_properties(ABCMAKE_VERSION ${ABCMAKE_VERSION})
                  
     # Add target to the target list
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
-                 ABCMAKE_TARGETS ${TARGETNAME})
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY 
+                 BCMAKE_TARGETS ${TARGETNAME})
         
     target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
     target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
