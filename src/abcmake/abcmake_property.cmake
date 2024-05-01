@@ -1,40 +1,47 @@
 # ==============================================================================
 # abcmake_property.cmake =======================================================
 
+# List of the global abcmake properties:
+# - ABCMAKE_COMPONENTS_DIR
+# - ABCMAKE_SRC_DIR
+# - ABCMAKE_INCLUDE_DIR
+# - ABCMAKE_INSTALL_DIR
+
 # Default prop values
 # ===================
 
-set(ABC_COMPONENTS_DIR "components")
-set(ABC_SRC_DIR "src")
-set(ABC_INCLUDE_DIR "include")
-set(ABC_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
-set(ABC_INSTALL_LIB_SUBDIR "lib")
-set(ABC_INSTALL_EXE_SUBDIR ".")
-set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE")
+# A change in any of these variables will cause a breaking change in the API
+set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE_")
+set(ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
+set(ABCMAKE_DEFAULT_SRC_DIR "src")
+set(ABCMAKE_DEFAULT_INCLUDE_DIR "include")
+set(ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
+
 
 # Setters
 # =======
 
 function(_set_abcprop PROPERTY_NAME PROPERTY_VALUE)
     set_property(GLOBAL PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
 endfunction()
 
 function(_append_abcprop PROPERTY_NAME PROPERTY_VALUE)
     set_property(GLOBAL APPEND PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
 endfunction()
 
 function(_set_abcprop_curdir PROPERTY_NAME PROPERTY_VALUE)
     set_directory_properties(PROPERTIES
-                             ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME} ${PROPERTY_VALUE})
+                             ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
 endfunction()
 
 function(_append_abcprop_curdir PROPERTY_NAME PROPERTY_VALUE)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
                  APPEND PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
 endfunction()
+
 
 # Getters
 # =======
@@ -52,7 +59,7 @@ function(_get_abcprop PROPERTY_NAME OUT_VAR_NAME)
 
     # Getting the property
     get_property(tmp_result GLOBAL PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME})
+                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME})
                  
     # If not found, try to use the fallback
     if(NOT tmp_result AND arg_FALLBACK)
@@ -65,7 +72,7 @@ endfunction()
 
 function(_get_abcprop_dir DIRECTORY PROPERTY_NAME OUT_VAR_NAME)
     get_directory_property(tmp_result DIRECTORY ${DIRECTORY}
-        ${ABCMAKE_PROPERTY_PREFIX}_${PROPERTY_NAME})
+        ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
@@ -74,25 +81,25 @@ endfunction()
 
 function(_get_abc_components OUT_VAR_NAME)
     _get_abcprop("COMPONENTS_DIR" tmp_result 
-                 FALLBACK ${ABC_COMPONENTS_DIR})
+                 FALLBACK ${ABCMAKE_DEFAULT_COMPONENTS_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_get_abc_src OUT_VAR_NAME)
     _get_abcprop("SRC_DIR" tmp_result  
-                 FALLBACK ${ABC_SRC_DIR})
+                 FALLBACK ${ABCMAKE_DEFAULT_SRC_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_get_abc_include OUT_VAR_NAME)
     _get_abcprop("INCLUDE_DIR" tmp_result 
-                 FALLBACK ${ABC_INCLUDE_DIR})
+                 FALLBACK ${ABCMAKE_DEFAULT_INCLUDE_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_get_abc_install OUT_VAR_NAME)
     _get_abcprop("INSTALL_DIR" tmp_result 
-                 FALLBACK ${ABC_INSTALL_DIR})
+                 FALLBACK ${ABCMAKE_DEFAULT_INSTALL_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE) 
 endfunction()
 

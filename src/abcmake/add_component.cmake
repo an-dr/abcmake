@@ -2,6 +2,8 @@
 # add_component.cmake ==========================================================
 
 include(CMakeParseArguments)
+set(ABC_INSTALL_LIB_SUBDIR "lib")
+set(ABC_INSTALL_EXE_SUBDIR ".")
 
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
