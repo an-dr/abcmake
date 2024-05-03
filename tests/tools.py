@@ -28,10 +28,10 @@ class TestCMake(unittest.TestCase):
         shutil.rmtree("build", ignore_errors=True)
         shutil.rmtree("install", ignore_errors=True)
         
-        p = subprocess.run('cmake -B build -DCMAKE_BUILD_TYPE=Release -G "Ninja"')
+        p = subprocess.run(['cmake', '-B', 'build', '-DCMAKE_BUILD_TYPE=Release', '-G', 'Ninja'])
         self.assertEqual(p.returncode, 0, p.stdout)
-        p = subprocess.run('cmake --build build --config Release')
+        p = subprocess.run(['cmake', '--build', 'build', '--config', 'Release'])
         self.assertEqual(p.returncode, 0, p.stdout)
-        p = subprocess.run('cmake --install build --config Release')
+        p = subprocess.run(['cmake', '--install', 'build', '--config', 'Release'])
         self.assertEqual(p.returncode, 0, p.stdout)
         os.chdir(self.ROOT_PATH)
