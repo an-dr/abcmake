@@ -22,17 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Simple Project - Build and Install
-      run: bash ./tests/project/run.sh
-      
-    - name: Project with Custom Folders - Build and Install
-      run: bash ./tests/project_custom/run.sh
-      
-    - name: Project with Component Interconnections
-      run: bash ./tests/test_interdep/run.sh
-      
-    - name: Gen compile_commands.json
-      run: bash ./tests/test_compile_commands/run.sh
-      
-    - name: Release Updated
-      run: python ./tests/test_release_updated.py
+    - name: UnitTests
+      working-directory: tests
+      run: python -m unittest discover -v
