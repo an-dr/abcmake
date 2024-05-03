@@ -7,6 +7,7 @@
 # e-mail:  mail@agramakov.me
 #
 # *************************************************************************
+import unittest
 import os
 import re
 
@@ -49,23 +50,28 @@ def write_file(path, data):
     with open(path, "w", encoding='utf-8') as f:
         f.write(data)
 
-if __name__ == '__main__':
-    set_cwd_to_repo()
-    
-    main_file = get_main_file()
-    includes = get_lines_starting_with_include(main_file)
-    includes = get_list_with_str_containing(includes, "CMAKE_CURRENT_LIST_DIR")
-    
-    replace_dict = get_replacement_dict(includes)
 
-    main_file_new = main_file
-    for old, new in replace_dict.items():
-        main_file_new = main_file_new.replace(old,new)
+class TestsRelease(unittest.TestCase):
+
+    def test_release_updated(self):
+        set_cwd_to_repo()
+        
+        main_file = get_main_file()
+        includes = get_lines_starting_with_include(main_file)
+        includes = get_list_with_str_containing(includes, "CMAKE_CURRENT_LIST_DIR")
+        
+        replace_dict = get_replacement_dict(includes)
+
+        main_file_new = main_file
+        for old, new in replace_dict.items():
+            main_file_new = main_file_new.replace(old,new)
+        
+        
+        self.assertEqual(main_file_new, read_file("release/ab.cmake"))
+        
+
+
+if __name__ == '__main__':
+    unittest.main()
     
-    
-    if main_file_new == read_file("release/ab.cmake"):
-        print("✅ Updated!")
-    else:
-        print("❌ Changes detected! Generate a new release!")
-        exit(1)
         
