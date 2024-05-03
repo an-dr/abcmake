@@ -38,6 +38,8 @@ function(_abc_AddProject PATH OUT_ABCMAKE_VER)
 endfunction()
 
 # Link the component to the target
+# DEPRECATED! Use target_link_components instead
+#
 # @param TARGETNAME - name of the target for linking
 # @param COMPONENTPATH - path to the component to link
 function (target_link_component TARGETNAME COMPONENTPATH)
@@ -47,6 +49,24 @@ function (target_link_component TARGETNAME COMPONENTPATH)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
+endfunction()
+
+# Link components to the target
+# @param TARGETNAME - name of the target for linking
+# @param COMPONENTPATHS - path to the component to link
+function (target_link_components TARGETNAME)
+    set(flags)
+    set(args)
+    set(listArgs COMPONENTPATHS)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    
+    foreach(COMPONENTPATH ${COMPONENTPATHS})
+        target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    endforeach()
+    
+    foreach(COMPONENTPATH ${ARGN})
+        target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    endforeach()
 endfunction()
 
 # target_link_component.cmake ==================================================

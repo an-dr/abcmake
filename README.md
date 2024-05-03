@@ -1,6 +1,6 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-5.1.2-green)
+![version](https://img.shields.io/badge/version-5.2.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module to work with C/C++ project of a predefined standard structure in order to simplify the build process.
@@ -71,7 +71,7 @@ If you want to use the module in your project, you can use the badge:
 
 - `add_main_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR])` - Add the executable component. It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively.
 - `add_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR SHARED])` - Add a component as a library. It will scan the same default directories as *add_main_component*.
-- `target_link_component (TARGETNAME COMPONENTPATH)` - Add a component to the target. Can be used for linking components between each other.
+- `target_link_components (TARGETNAME COMPONENTPATHS)` - Add components to the target. Can be used for linking components from custom directories and linking components between each other.
 - `target_sources_directory(TARGETNAME SOURCE_DIR)` - Add all sources from the directory
 
 

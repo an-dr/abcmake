@@ -8,7 +8,7 @@ add_main_component(${PROJECT_NAME}
                    INCLUDE_DIR "./includes" 
                    SOURCE_DIR "./sources")
 
-target_link_component(${PROJECT_NAME} ./lib_world)
-target_link_component(${PROJECT_NAME} ./lib_exclamation)
+target_link_components(${PROJECT_NAME} ./lib_world
+                                       ./lib_exclamation)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE exclamation)
