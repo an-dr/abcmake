@@ -5,11 +5,11 @@
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
 
-The module is designed to simplify the process of creating and linking components in a project. The module works the best with small and medium-sized projects.
+The module is designed to simplify the process of creating and linking components in a project. The module works best with small and medium-sized projects.
 
 [![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
 
-The default project structure is shown bellow but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
+The default project structure is shown below but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
 
 ```
 Default project structure
@@ -73,7 +73,7 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-*The module provides tree powerfull functions, fully compatible with the standard CMake.*
+*The module provides three powerful functions, fully compatible with the standard CMake.*
 
 ### add_main_component
 
@@ -81,9 +81,9 @@ If you want to use the module in your project, you can use the badge:
 add_main_component(<name> [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
 ```
 
-Add an executable target. It links all components in the **components** folder automatically. If the component is not an abcmake component, the directory will be added but the linking have to be done manually using [`target_link_libraries`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html#target-link-libraries).
+Add an executable target. It links all components in the **components** folder automatically. If the component is not an abcmake component, the directory will be added but the linking has to be done manually using [`target_link_libraries`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html#target-link-libraries).
 
-Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
+The default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
 
 ```cmake
 # Will look for `include` and `src` directories in the root folder, 
@@ -113,7 +113,7 @@ Add components to the target. Can be used for linking components from custom dir
 
 
 ```cmake
-# Linking a component in the same fodler
+# Linking a component in the same folder
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
 
 # Linking many components
@@ -123,7 +123,7 @@ target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello
 
 ## Real Life Example (abcmake v5.1.1)
 
-Lets see the file structure of on of my projects:
+Let's see the file structure of one of my projects:
 
 ```txt
 📦VisioneR
