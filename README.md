@@ -69,12 +69,59 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-The module provides tree powerfull functions, fully compatible with the standard CMake. 
+*The module provides tree powerfull functions, fully compatible with the standard CMake.*
 
-- **`add_main_component(TARGETNAME [INCLUDE_DIR] [SOURCE_DIR])`** - Add an executable target. Create a  It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
-- **`add_component(TARGETNAME [INCLUDE_DIR] [SOURCE_DIR] [SHARED])`** - Add a library target. Works similarly to `add_main_component`
-- **`target_link_components (TARGETNAME COMPONENT_DIR)`** - Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values.
+```cmake
+add_main_component(<name> [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
+```
 
+Add an executable target. It links all components in the **components** folder automatically. If the component is not an abcmake component, the directory will be added but the linking have to be done manually using [`target_link_libraries`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html#target-link-libraries).
+
+Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
+
+Examples:
+
+```cmake
+
+# The default structure
+# Will look for include and src directories in the root folder, and will link all components in the components folder
+add_main_component(HelloWorld)
+
+# Custom include and source directories
+add_main_component(HelloWorld INCLUDE_DIR "private_include" "public_include" 
+                              SOURCE_DIR "src1" "src2")
+
+```
+
+---
+
+```cmake
+add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
+```
+
+Add a library target. If the `SHARED` keyword is present, the library will be shared, overwise it will be static.  Works similarly to `add_main_component`.
+
+---
+
+```cmake
+target_link_components (<target> <component_paths> ...)
+```
+
+Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`.
+
+Examples:
+
+```cmake
+
+# Linking a component in the same fodler
+target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
+
+# Linking many components
+target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                                      ${CMAKE_CURRENT_LIST_DIR}/libs/worls)
+
+
+```
 
 ## Real Life Example (abcmake v5.1.1)
 
