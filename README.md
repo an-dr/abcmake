@@ -118,7 +118,7 @@ target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component
 
 # Linking many components
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
-                                      ${CMAKE_CURRENT_LIST_DIR}/libs/worls)
+                                       ${CMAKE_CURRENT_LIST_DIR}/libs/world)
 ```
 
 ## Real Life Example (abcmake v5.1.1)
