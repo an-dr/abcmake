@@ -3,13 +3,18 @@
 ![version](https://img.shields.io/badge/version-5.3.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
-`abcmake` or **Andrei's Build CMake subsystem** is a CMake module to work with C/C++ project of a predefined standard structure in order to simplify the build process.
+`abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
+
+The module is designed to simplify the process of creating and linking components in a project. The module works the best with small and medium-sized projects.
 
 [![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
 
-The supported project structure looks like this:
+The default project structure is shown bellow but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
 
 ```
+Default project structure
+-------------------------
+
 +📁Root Project
 |
 |--+📁components    <------- nested abcmake projects
@@ -21,12 +26,8 @@ The supported project structure looks like this:
 |  |  |---ab.cmake
 |  |  '--CMakeLists.txt
 |  |
-|  '--+📁component2
-|     |---📁include
-|     |---📁components
-|     |---📁src
-|     |---ab.cmake
-|     '--CMakeLists.txt
+|  |--+📁component2
+|  ...
 |
 |---📁include
 |---📁src
