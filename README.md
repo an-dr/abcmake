@@ -84,19 +84,14 @@ Add an executable target. It links all components in the **components** folder a
 
 Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
 
-Examples:
-
 ```cmake
-
-# The default structure
-# Will look for include and src directories in the root folder, 
-# and will link all components in the components folder
+# Will look for `include` and `src` directories in the root folder, 
+# and will link all components in the `components` folder
 add_main_component(HelloWorld)
 
 # Custom include and source directories
 add_main_component(HelloWorld INCLUDE_DIR "private_include" "public_include" 
                               SOURCE_DIR "src1" "src2")
-
 ```
 
 ### add_component
@@ -115,18 +110,14 @@ target_link_components (<target> <component_paths> ...)
 
 Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`.
 
-Examples:
 
 ```cmake
-
 # Linking a component in the same fodler
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
 
 # Linking many components
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
                                       ${CMAKE_CURRENT_LIST_DIR}/libs/worls)
-
-
 ```
 
 ## Real Life Example (abcmake v5.1.1)
