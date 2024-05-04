@@ -135,7 +135,7 @@ endfunction()
 # @param TARGETNAME - name of the target to add the component
 # @param INCLUDE_DIR - paths to the include directories
 # @param SOURCE_DIR - paths to the source directories
-# @param SHARED - if set to TRUE, the library will be shared
+# @param SHARED - if set, the library will be shared
 function(add_component TARGETNAME)
     set(flags SHARED)
     set(args)
