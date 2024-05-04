@@ -18,6 +18,13 @@ function(_abc_AddComponents TARGETNAME)
     
 endfunction()
 
+# Add all source files from the specified directory to the target
+# @param TARGETNAME - name of the target to add sources
+function(target_sources_directory TARGETNAME SOURCE_DIR)
+    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
+    message( DEBUG "${TARGETNAME} sources: ${SOURCES}")
+    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+endfunction()
 
 # Install the target near the build directory
 # @param TARGETNAME - name of the target to install
@@ -34,7 +41,21 @@ endfunction()
 # @param TARGETNAME - name of the target to initialize
 # @param INCLUDE_DIR - path to the include directory
 # @param SOURCE_DIR - path to the source directory
-function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
+function(_target_init_abcmake TARGETNAME)
+    set(flags)
+    set(args)
+    set(listArgs INCLUDE_DIR SOURCE_DIR)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+
+    message(STATUS "🔤src: ${arg_SOURCE_DIR}")
+    
+    if (NOT arg_SOURCE_DIR)
+        set(arg_SOURCE_DIR "src")
+    endif()
+
+    if (NOT arg_INCLUDE_DIR)
+        set(arg_INCLUDE_DIR "include")
+    endif()
 
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
@@ -49,9 +70,12 @@ function(_target_init_abcmake TARGETNAME INCLUDE_DIR SOURCE_DIR)
     # Add target to the target list
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
                  ABCMAKE_TARGETS ${TARGETNAME})
-        
-    target_sources_directory(${TARGETNAME} ${SOURCE_DIR})
-    target_include_directories(${TARGETNAME} PUBLIC ${INCLUDE_DIR})
+    
+    foreach(s ${arg_SOURCE_DIR})
+        target_sources_directory(${TARGETNAME} ${s})
+    endforeach()
+    
+    target_include_directories(${TARGETNAME} PUBLIC ${arg_INCLUDE_DIR})
     _abc_AddComponents(${TARGETNAME})
 
 endfunction()
@@ -75,15 +99,17 @@ function(add_main_component TARGETNAME)
     endif()
     
     add_executable(${TARGETNAME})
-    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
+    _target_init_abcmake(${TARGETNAME} 
+                         INCLUDE_DIR ${arg_INCLUDE_DIR} 
+                         SOURCE_DIR ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} ".")
 endfunction()
 
 # Add a shared or static library component to the project
 # @param TARGETNAME - name of the target to add the component
-# @param INCLUDE_DIR - path to the include directory
-# @param SOURCE_DIR - path to the source directory
-# @param SHARED - if set to TRUE, the library will be shared
+# @param INCLUDE_DIR - paths to the include directories
+# @param SOURCE_DIR - paths to the source directories
+# @param SHARED - if set, the library will be shared
 function(add_component TARGETNAME)
     set(flags SHARED)
     set(args)
@@ -104,7 +130,9 @@ function(add_component TARGETNAME)
         add_library(${TARGETNAME} STATIC)
     endif()
     
-    _target_init_abcmake(${TARGETNAME} ${arg_INCLUDE_DIR} ${arg_SOURCE_DIR})
+    _target_init_abcmake(${TARGETNAME} 
+                         INCLUDE_DIR ${arg_INCLUDE_DIR} 
+                         SOURCE_DIR ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} "lib")
 endfunction()
 

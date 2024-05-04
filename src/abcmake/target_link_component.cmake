@@ -53,14 +53,14 @@ endfunction()
 
 # Link components to the target
 # @param TARGETNAME - name of the target for linking
-# @param COMPONENTPATHS - path to the component to link
+# @param COMPONENT_DIR - path to the component to link
 function (target_link_components TARGETNAME)
     set(flags)
     set(args)
-    set(listArgs COMPONENTPATHS)
+    set(listArgs COMPONENT_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
     
-    foreach(COMPONENTPATH ${COMPONENTPATHS})
+    foreach(COMPONENTPATH ${COMPONENT_DIR})
         target_link_component(${TARGETNAME} ${COMPONENTPATH})
     endforeach()
     

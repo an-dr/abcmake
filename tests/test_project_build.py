@@ -11,6 +11,9 @@ class TestBuild(TestCMake):
     def test_default_project(self):
         self.build_cmake("test_default_project")
     
+    def test_many_folders(self):
+        self.build_cmake("test_many_folders")
+    
     def test_project_custom(self):
         self.build_cmake("test_project_custom")
     

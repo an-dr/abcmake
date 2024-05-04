@@ -1,15 +1,20 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-5.2.0-green)
+![version](https://img.shields.io/badge/version-5.3.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
-`abcmake` or **Andrei's Build CMake subsystem** is a CMake module to work with C/C++ project of a predefined standard structure in order to simplify the build process.
+`abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
+
+The module is designed to simplify the process of creating and linking components in a project. The module works the best with small and medium-sized projects.
 
 [![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
 
-The supported project structure looks like this:
+The default project structure is shown bellow but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
 
 ```
+Default project structure
+-------------------------
+
 +📁Root Project
 |
 |--+📁components    <------- nested abcmake projects
@@ -21,12 +26,8 @@ The supported project structure looks like this:
 |  |  |---ab.cmake
 |  |  '--CMakeLists.txt
 |  |
-|  '--+📁component2
-|     |---📁include
-|     |---📁components
-|     |---📁src
-|     |---ab.cmake
-|     '--CMakeLists.txt
+|  |--+📁component2
+|  ...
 |
 |---📁include
 |---📁src
@@ -41,6 +42,9 @@ The supported project structure looks like this:
     - [Table of Contents](#table-of-contents)
     - [Quick Start](#quick-start)
     - [Public Functions](#public-functions)
+        - [add\_main\_component](#add_main_component)
+        - [add\_component](#add_component)
+        - [target\_link\_component](#target_link_component)
     - [Real Life Example (abcmake v5.1.1)](#real-life-example-abcmake-v511)
 
 ## Quick Start
@@ -69,11 +73,53 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-- `add_main_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR])` - Add the executable component. It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively.
-- `add_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR SHARED])` - Add a component as a library. It will scan the same default directories as *add_main_component*.
-- `target_link_components (TARGETNAME COMPONENTPATHS)` - Add components to the target. Can be used for linking components from custom directories and linking components between each other.
-- `target_sources_directory(TARGETNAME SOURCE_DIR)` - Add all sources from the directory
+*The module provides tree powerfull functions, fully compatible with the standard CMake.*
 
+### add_main_component
+
+```cmake
+add_main_component(<name> [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
+```
+
+Add an executable target. It links all components in the **components** folder automatically. If the component is not an abcmake component, the directory will be added but the linking have to be done manually using [`target_link_libraries`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html#target-link-libraries).
+
+Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
+
+```cmake
+# Will look for `include` and `src` directories in the root folder, 
+# and will link all components in the `components` folder
+add_main_component(HelloWorld)
+
+# Custom include and source directories
+add_main_component(HelloWorld INCLUDE_DIR "private_include" "public_include" 
+                              SOURCE_DIR "src1" "src2")
+```
+
+### add_component
+
+```cmake
+add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
+```
+
+Add a library target. If the `SHARED` keyword is present, the library will be shared, overwise it will be static.  Works similarly to `add_main_component`.
+
+### target_link_component
+
+```cmake
+target_link_components (<target> <component_paths> ...)
+```
+
+Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`.
+
+
+```cmake
+# Linking a component in the same fodler
+target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
+
+# Linking many components
+target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                                       ${CMAKE_CURRENT_LIST_DIR}/libs/world)
+```
 
 ## Real Life Example (abcmake v5.1.1)
 
