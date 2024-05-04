@@ -41,6 +41,9 @@ The supported project structure looks like this:
     - [Table of Contents](#table-of-contents)
     - [Quick Start](#quick-start)
     - [Public Functions](#public-functions)
+        - [add\_main\_component](#add_main_component)
+        - [add\_component](#add_component)
+        - [target\_link\_component](#target_link_component)
     - [Real Life Example (abcmake v5.1.1)](#real-life-example-abcmake-v511)
 
 ## Quick Start
@@ -71,6 +74,8 @@ If you want to use the module in your project, you can use the badge:
 
 *The module provides tree powerfull functions, fully compatible with the standard CMake.*
 
+### add_main_component
+
 ```cmake
 add_main_component(<name> [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
 ```
@@ -84,7 +89,8 @@ Examples:
 ```cmake
 
 # The default structure
-# Will look for include and src directories in the root folder, and will link all components in the components folder
+# Will look for include and src directories in the root folder, 
+# and will link all components in the components folder
 add_main_component(HelloWorld)
 
 # Custom include and source directories
@@ -93,7 +99,7 @@ add_main_component(HelloWorld INCLUDE_DIR "private_include" "public_include"
 
 ```
 
----
+### add_component
 
 ```cmake
 add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources> ...)
@@ -101,7 +107,7 @@ add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources
 
 Add a library target. If the `SHARED` keyword is present, the library will be shared, overwise it will be static.  Works similarly to `add_main_component`.
 
----
+### target_link_component
 
 ```cmake
 target_link_components (<target> <component_paths> ...)
