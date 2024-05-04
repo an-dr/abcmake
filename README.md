@@ -69,10 +69,11 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-- `add_main_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR])` - Add the executable component. It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively.
-- `add_component(TARGETNAME [INCLUDE_DIR SOURCE_DIR SHARED])` - Add a component as a library. It will scan the same default directories as *add_main_component*.
-- `target_link_components (TARGETNAME COMPONENTPATHS)` - Add components to the target. Can be used for linking components from custom directories and linking components between each other.
-- `target_sources_directory(TARGETNAME SOURCE_DIR)` - Add all sources from the directory
+The module provides tree powerfull functions, fully compatible with the standard CMake. 
+
+- **`add_main_component(TARGETNAME [INCLUDE_DIR] [SOURCE_DIR])`** - Add an executable target. Create a  It will link all components in the **components** folder automatically. Default include and source directories are **include** and **src** respectively. You can override them with your custom list of directories.
+- **`add_component(TARGETNAME [INCLUDE_DIR] [SOURCE_DIR] [SHARED])`** - Add a library target. Works similarly to `add_main_component`
+- **`target_link_components (TARGETNAME COMPONENT_DIR)`** - Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values.
 
 
 ## Real Life Example (abcmake v5.1.1)
