@@ -38,10 +38,6 @@ function (target_link_components TARGETNAME)
     message(DEBUG "target_link_components arg_PATH: ${arg_PATH}")
     message(DEBUG "target_link_components arg_NAME: ${arg_NAME}")
     
-    foreach(COMPONENTPATH ${arg_PATH})
-        _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
-    endforeach()
-    
     # Link components by name
     foreach(NAME ${arg_NAME})
         _abcmake_get_from_registry(${NAME} reg_path)

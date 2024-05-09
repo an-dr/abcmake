@@ -4,14 +4,21 @@
 set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
 function(register_component COMPONENT_PATH)
-    _abcmake_add_project(${COMPONENT_PATH} PROJECT_ABCMAKE_VER)
-    if(PROJECT_ABCMAKE_VER)
-        _abcmake_get_prop_dir(${COMPONENT_PATH} ${ABCMAKE_DIRPROP_COMPONENT_NAME} component_name)
-        set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${COMPONENT_PATH}")
-        
-        _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
-        message(STATUS "Component registered: ${component_name}")
-    endif()
+
+    foreach(path ${ARGV})
+        message(STATUS "🔤 Register component")
+        message(DEBUG "  📂 Path: ${path}")
+        _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
+        if(PROJECT_ABCMAKE_VER)
+            _abcmake_get_prop_dir(${path} ${ABCMAKE_DIRPROP_COMPONENT_NAME} component_name)
+            set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${path}")
+            _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
+            
+            message(STATUS "  ✅ Registered: ${component_name}")
+            
+        endif()
+    endforeach()
+    
 endfunction()
 
 # Splits into COMPONENT_ENTRY into COMPONENT_NAME and COMPONENT_PATH
@@ -33,6 +40,7 @@ endfunction()
 # Gets the path of a component from the registry. Returns null if not found.
 function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     _abcmake_get_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} registry)
+    message(DEBUG "Get ${COMPONENT_NAME} from : ${registry}")
     foreach(entry ${registry})
         _split_component_entry(${entry} name path)
         if(name STREQUAL COMPONENT_NAME)
