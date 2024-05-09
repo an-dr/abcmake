@@ -121,7 +121,7 @@ register_components(${CMAKE_CURRENT_LIST_DIR}/libs/hello
 ### target_link_components
 
 ```cmake
-target_link_components (<target> [PATH ] <component_paths> ... [NAME] <component_names> ...)
+target_link_components (<target> [PATH] <component_paths> ... [NAME] <component_names> ...)
 ```
 
 Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`. To be able to link components by name, they must be registered via `register_components` function.
