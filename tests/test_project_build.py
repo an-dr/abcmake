@@ -17,6 +17,9 @@ class TestBuild(TestCMake):
     def test_project_custom(self):
         self.build_cmake("test_project_custom")
     
+    def test_register(self):
+        self.build_cmake("test_register")
+    
     def test_compile_commands(self):
         self.build_cmake("test_compile_commands")
         # verify file exists
