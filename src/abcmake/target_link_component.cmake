@@ -27,24 +27,31 @@ endfunction()
 
 # Link components to the target
 # @param TARGETNAME - name of the target for linking
-# @param COMPONENT_DIR - paths to components to link
-# @param COMPONENT_NAME - names of components to link
+# @param PATH - paths to components to link
+# @param NAME - names of components to link
 function (target_link_components TARGETNAME)
     set(flags)
     set(args)
-    set(listArgs COMPONENT_DIR COMPONENT_NAME)
+    set(listArgs PATH NAME)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
     
-    foreach(COMPONENTPATH ${arg_COMPONENT_DIR})
+    message(DEBUG "target_link_components arg_PATH: ${arg_PATH}")
+    message(DEBUG "target_link_components arg_NAME: ${arg_NAME}")
+    
+    foreach(COMPONENTPATH ${arg_PATH})
         _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
     endforeach()
     
     # Link components by name
-    foreach(NAME ${arg_COMPONENT_NAME})
-        _abcmake_get_from_registry(${NAME} COMPONENTPATH)
-        if (COMPONENTPATH)
-            message ( DEBUG "Found component: ${NAME} -> ${COMPONENTPATH}")
-            _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    foreach(NAME ${arg_NAME})
+        _abcmake_get_from_registry(${NAME} reg_path)
+        if (reg_path)
+            message ( DEBUG "Found component: ${NAME} -> ${reg_path}")
+            _abcmake_target_link_component(${TARGETNAME} ${reg_path})
+        else()
+            message ( STATUS "❌ Component ${NAME} not found!")
+            message ( STATUS "   Use `register_component` to add it to the registry")
+            message (FATAL_ERROR "Component ${NAME} not found in the registry")
         endif()
     endforeach()
 endfunction()

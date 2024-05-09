@@ -37,6 +37,7 @@ set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE_")
 
 # Global properties:
 set(ABCMAKE_PROP_ADDED_PROJECTS "ADDED_PROJECTS") # The list of projects that have been added to the solution
+set(ABCMAKE_PROP_COMPONENT_REGISTRY "COPONENT_REGISTRY") # Component registry
 set(_ABCMAKE_PROP_COMPONENTS_DIR "COMPONENTS_DIR") # The directory where the components are stored
 set(_ABCMAKE_PROP_SRC_DIR "SRC_DIR") # The directory where the source files are stored
 set(_ABCMAKE_PROP_INCLUDE_DIR "INCLUDE_DIR") # The directory where the include files are stored
@@ -44,6 +45,7 @@ set(_ABCMAKE_PROP_INSTALL_DIR "INSTALL_DIR") # The directory where the project w
 
 # Directory-scope properties
 set(ABCMAKE_DIRPROP_VERSION "VERSION") # The abcmake version of the component
+set(ABCMAKE_DIRPROP_COMPONENT_NAME "COMPONENT_NAME") # The name of the component (local PROJECT_NAME)
 set(ABCMAKE_DIRPROP_TARGETS "TARGETS") # The list of targets built by the component
 
 # Default values
@@ -51,6 +53,7 @@ set(_ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
 set(_ABCMAKE_DEFAULT_SRC_DIR "src")
 set(_ABCMAKE_DEFAULT_INCLUDE_DIR "include")
 set(_ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
+
 
 # Setters
 # =======
@@ -149,13 +152,14 @@ function(_abcmake_add_subdirectory PATH)
 
     # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
     _abcmake_get_prop(${ABCMAKE_PROP_ADDED_PROJECTS} projects)
+    message(DEBUG "Added projects: ${projects}")
     
     # Resolve relative path
     get_filename_component(PATH "${PATH}" ABSOLUTE)
     
     if (NOT PATH IN_LIST projects)
         # Add PATH to the global list
-        _abcmake_set_prop(${ABCMAKE_PROP_ADDED_PROJECTS} ${PATH})
+        _abcmake_append_prop(${ABCMAKE_PROP_ADDED_PROJECTS} ${PATH})
         
         # Use the last directory name for a binary directory name 
         get_filename_component(last_dir "${PATH}" NAME)
@@ -165,18 +169,23 @@ function(_abcmake_add_subdirectory PATH)
 endfunction()
 
 function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
-    if (EXISTS ${PATH}/CMakeLists.txt)
-        message(DEBUG "Adding project ${PATH}")
-        _abcmake_add_subdirectory(${PATH})
-        
-        _abcmake_get_prop_dir(${PATH} "VERSION" version)
-        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
-        if (NOT version)
-            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
-        endif()
-        
-    else()
+    if (NOT EXISTS ${PATH})
+        message (STATUS "  ❌ Path \"${PATH}\" does not exist!")
+        return()
+    endif()
+    
+    if (NOT EXISTS ${PATH}/CMakeLists.txt)
         message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
+        return()
+    endif()
+
+    message(DEBUG "Adding project ${PATH}")
+    _abcmake_add_subdirectory(${PATH})
+    
+    _abcmake_get_prop_dir(${PATH} "VERSION" version)
+    set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
+    if (NOT version)
+        message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
     endif()
 endfunction()
 
@@ -208,7 +217,7 @@ function(_abcmake_add_components TARGETNAME)
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
-            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
+            target_link_components(${TARGETNAME} COMPONENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
         endif()
     endforeach()
     
@@ -260,7 +269,10 @@ function(_abcmake_target_init TARGETNAME)
     
     # Report version
     _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
-                 
+    
+    # Set name
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_COMPONENT_NAME} ${PROJECT_NAME})
+    
     # Add target to the target list
     _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
     
@@ -309,6 +321,7 @@ function(add_component TARGETNAME)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    message(DEBUG "add_component: ${TARGETNAME}")
 
     if (NOT arg_SOURCE_DIR)
         _abcmake_get_src(arg_SOURCE_DIR)
@@ -330,7 +343,6 @@ function(add_component TARGETNAME)
     _abcmake_target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
 endfunction()
 
-
 # add_component.cmake ==========================================================
 # ==============================================================================
 
@@ -338,12 +350,47 @@ endfunction()
 # ==============================================================================
 # component_register.cmake =====================================================
 
+set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
 function(register_component COMPONENT_PATH)
-
+    _abcmake_add_project(${COMPONENT_PATH} PROJECT_ABCMAKE_VER)
+    if(PROJECT_ABCMAKE_VER)
+        _abcmake_get_prop_dir(${COMPONENT_PATH} ${ABCMAKE_DIRPROP_COMPONENT_NAME} component_name)
+        set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${COMPONENT_PATH}")
+        
+        _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
+        message(STATUS "Component registered: ${component_name}")
+    endif()
 endfunction()
 
+# Splits into COMPONENT_ENTRY into COMPONENT_NAME and COMPONENT_PATH
+function (_split_component_entry COMPONENT_ENTRY OUT_NAME OUT_PATH)
+    string(FIND ${COMPONENT_ENTRY} ${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR} sep_pos)
+    if(sep_pos EQUAL -1)
+        message(FATAL_ERROR "Invalid component entry: ${COMPONENT_ENTRY}")
+    endif()
+    
+    string(REGEX MATCH "^(.+)${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}(.+)"
+           ENTRY_MATCH ${COMPONENT_ENTRY})
+    set(name ${CMAKE_MATCH_1})
+    set(path ${CMAKE_MATCH_2})
+    
+    set(${OUT_NAME} ${name} PARENT_SCOPE)
+    set(${OUT_PATH} ${path} PARENT_SCOPE)
+endfunction()
 
+# Gets the path of a component from the registry. Returns null if not found.
+function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
+    _abcmake_get_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} registry)
+    foreach(entry ${registry})
+        _split_component_entry(${entry} name path)
+        if(name STREQUAL COMPONENT_NAME)
+            set(${OUT_PATH} ${path} PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
+endfunction()
+    
 # component_register.cmake =====================================================
 # ==============================================================================
 
@@ -353,34 +400,50 @@ endfunction()
 # target_link_component.cmake ==================================================
 
 # Link the component to the target
+#
+# @param TARGETNAME - name of the target for linking
+# @param COMPONENTPATH - path to the component to link
+function (_abcmake_target_link_component TARGETNAME COMPONENTPATH)
+    _abcmake_add_project(${COMPONENTPATH} ver)
+    if (ver)
+        _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
+        message (STATUS "  ✅ Linking to ${TARGETNAME}: ${to_link}")
+        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
+    endif()
+endfunction()
+
+# Link the component to the target
 # DEPRECATED! Use target_link_components instead
 #
 # @param TARGETNAME - name of the target for linking
 # @param COMPONENTPATH - path to the component to link
 function (target_link_component TARGETNAME COMPONENTPATH)
-    _abcmake_add_project(${COMPONENTPATH} ver)
-    if (ver)
-        _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
-        message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
-        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
-    endif()
+    message(STATUS "❌ target_link_component is DEPRECATED! Use `target_link_components` instead")
+    _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
 endfunction()
+
 
 # Link components to the target
 # @param TARGETNAME - name of the target for linking
-# @param COMPONENT_DIR - path to the component to link
+# @param COMPONENT_DIR - paths to components to link
+# @param COMPONENT_NAME - names of components to link
 function (target_link_components TARGETNAME)
     set(flags)
     set(args)
-    set(listArgs COMPONENT_DIR)
+    set(listArgs COMPONENT_DIR COMPONENT_NAME)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
     
-    foreach(COMPONENTPATH ${COMPONENT_DIR})
-        target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    foreach(COMPONENTPATH ${arg_COMPONENT_DIR})
+        _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
     endforeach()
     
-    foreach(COMPONENTPATH ${ARGN})
-        target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    # Link components by name
+    foreach(NAME ${arg_COMPONENT_NAME})
+        _abcmake_get_from_registry(${NAME} COMPONENTPATH)
+        if (COMPONENTPATH)
+            message ( DEBUG "Found component: ${NAME} -> ${COMPONENTPATH}")
+            _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
+        endif()
     endforeach()
 endfunction()
 
