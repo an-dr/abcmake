@@ -14,6 +14,7 @@ function(register_component COMPONENT_PATH)
     endif()
 endfunction()
 
+# Splits into COMPONENT_ENTRY into COMPONENT_NAME and COMPONENT_PATH
 function (_split_component_entry COMPONENT_ENTRY OUT_NAME OUT_PATH)
     string(FIND ${COMPONENT_ENTRY} ${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR} sep_pos)
     if(sep_pos EQUAL -1)
@@ -29,6 +30,7 @@ function (_split_component_entry COMPONENT_ENTRY OUT_NAME OUT_PATH)
     set(${OUT_PATH} ${path} PARENT_SCOPE)
 endfunction()
 
+# Gets the path of a component from the registry. Returns null if not found.
 function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     _abcmake_get_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} registry)
     foreach(entry ${registry})

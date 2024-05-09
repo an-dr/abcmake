@@ -59,6 +59,30 @@
                 },
                 "problemMatcher": []
             },
+            {
+                "label": "Configure (DEBUG)",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S .",
+                    "--log-level=DEBUG"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/${input:test}",
+                    "env": {
+                        "ABCMAKE_PATH": "${workspaceFolder}/src",
+                    }
+                },
+                "problemMatcher": []
+            },
             // Cmake build
             {
                 "label": "Build",
@@ -107,9 +131,10 @@
                 "description": "Select test",
                 "default": "test_default_project",
                 "options": [
-                    { "value": "test_default_project", },
                     { "value": "test_compile_commands" },
+                    { "value": "test_default_project", },
                     { "value": "test_many_folders" },
+                    { "value": "test_project_custom" },
                     { "value": "test_register" },
                 ]
             }

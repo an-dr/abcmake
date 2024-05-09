@@ -122,6 +122,7 @@ function(add_component TARGETNAME)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    message(DEBUG "add_component: ${TARGETNAME}")
 
     if (NOT arg_SOURCE_DIR)
         _abcmake_get_src(arg_SOURCE_DIR)
@@ -142,7 +143,6 @@ function(add_component TARGETNAME)
                          SOURCE_DIR ${arg_SOURCE_DIR})
     _abcmake_target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
 endfunction()
-
 
 # add_component.cmake ==========================================================
 # ==============================================================================
