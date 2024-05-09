@@ -110,6 +110,7 @@
                     { "value": "test_default_project", },
                     { "value": "test_compile_commands" },
                     { "value": "test_many_folders" },
+                    { "value": "test_register" },
                 ]
             }
         ]
