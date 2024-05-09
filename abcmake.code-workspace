@@ -54,7 +54,8 @@
                 "options": {
                     "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
-                        "ABCMAKE_PATH": "${workspaceFolder}/src"
+                        "ABCMAKE_PATH": "${workspaceFolder}/src",
+                        "ABCMAKE_EMOJI": "1"
                     }
                 },
                 "problemMatcher": []
@@ -123,7 +124,7 @@
                 },
                 "problemMatcher": [],
             }
-        ]
+        ],
         "inputs": [
             {
                 "type": "pickString",

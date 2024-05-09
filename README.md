@@ -46,7 +46,7 @@ Default project structure
         - [add\_component](#add_component)
         - [register\_components](#register_components)
         - [target\_link\_components](#target_link_components)
-    - [Real Life Example (abcmake v5.1.1)](#real-life-example-abcmake-v511)
+    - [Configuration](#configuration)
 
 ## Quick Start
 
@@ -143,100 +143,8 @@ target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello
                                             SecondComponent)
 ```
 
-## Real Life Example (abcmake v5.1.1)
+## Configuration
 
-Let's see the file structure of one of my projects:
+The module can be configured by setting environment variables:
 
-```txt
-📦VisioneR
- |--+📁components
- |  |--+📁object_finder
- |  |  |--+📁include
- |  |  |  '--ObjectFinder.hpp
- |  |  |--+📁src
- |  |  |  '--ObjectFinder.cpp
- |  |  '--🔷CMakeLists.txt
- |  |
- |  '--+📁visioner_base
- |  |  |--+📁include
- |  |  |  '--+📁App
- |  |  |  |  |--App.hpp
- |  |  |  |  |--FaceInterface.hpp
- |  |  |  |  '--InputInterface.hpp
- |  |  |--+📁src
- |  |  |  '--App.cpp
- |  |  |--🔷CMakeLists.txt
- |  |  '--README.md
- |  | 
- |--+📁src
- |  |--+📁VisionerFile
- |  |  |--AppVisioner.cpp
- |  |  |--AppVisioner.hpp
- |  |  |--Face.cpp
- |  |  |--Face.hpp
- |  |  |--FileScanner.cpp
- |  |  |--FileScanner.hpp
- |  |  |--InputFiles.cpp
- |  |  |--InputFiles.hpp
- |  |  |--README.md
- |  |  '--main.cpp
- |  '--+📁VisionerWebcam
- |  |  |--AppVisioner.cpp
- |  |  |--AppVisioner.hpp
- |  |  |--Face.cpp
- |  |  |--Face.hpp
- |  |  |--FileScanner.cpp
- |  |  |--FileScanner.hpp
- |  |  |--InputWebcam.cpp
- |  |  |--InputWebcam.hpp
- |  |  '--main.cpp
- |--🔷CMakeLists.txt
- '--ab.cmake
- ```
-
-How much time would it take to write a CMakeLists.txt for this project? With `abcmake` it is just several lines:
-
-First component:
-
-```cmake
-cmake_minimum_required(VERSION 3.5)
-project(object_finder)
-
-include(${CMAKE_CURRENT_LIST_DIR}/../../ab.cmake)
-add_component(object_finder)
-```
-
-...second:
-
-```cmake
-cmake_minimum_required(VERSION 3.5)
-project(visioner_base)
-
-include(${CMAKE_CURRENT_LIST_DIR}/../../ab.cmake)
-add_component(visioner_base)
-target_link_component(visioner_base ${CMAKE_CURRENT_LIST_DIR}/../object_finder)
-```
-
-...and the main project:
-
-```cmake
-cmake_minimum_required(VERSION 3.15)
-project(visioner)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-
-# OpenCV
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-
-# Executable
-include(ab.cmake)
-add_main_component(VisionerFile SOURCE_DIR "src/VisionerFile")
-target_link_libraries(VisionerFile PRIVATE ${OpenCV_LIBS})
-
-add_main_component(VisionerWebcam SOURCE_DIR "src/VisionerWebcam")
-target_link_libraries(VisionerWebcam PRIVATE ${OpenCV_LIBS})
-```
-
-That's it! The project is ready to be built. The `abcmake` will take care of the rest. All the binaries will be installed along with the `build` directory.
+- `ABCMAKE_EMOJI` - if set will use emojis in the output.
