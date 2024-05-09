@@ -28,7 +28,7 @@ class TestCMake(unittest.TestCase):
         shutil.rmtree("build", ignore_errors=True)
         shutil.rmtree("install", ignore_errors=True)
         
-        p = subprocess.run(['cmake', '-B', 'build', '-DCMAKE_BUILD_TYPE=Release'],    
+        p = subprocess.run(['cmake', '-B', 'build', '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release'],    
                            stdout = subprocess.DEVNULL,
                            stderr = subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stdout)
