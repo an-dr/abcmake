@@ -18,6 +18,7 @@
 include(${CMAKE_CURRENT_LIST_DIR}/version.cmake)
 
 # Configure CMake
+set(ABCMAKE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # ----------------------------------------------------------------------------

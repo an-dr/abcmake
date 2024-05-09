@@ -22,6 +22,7 @@ set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE
 
 
 # Configure CMake
+set(ABCMAKE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # ----------------------------------------------------------------------------
@@ -216,7 +217,7 @@ function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     endif()
     
     if (NOT EXISTS ${PATH}/CMakeLists.txt)
-        _abcmake_log_note(1 "Path \"${PATH}\" is not a CMake project. Skipping...")
+        _abcmake_log_note(1 "No CMakeLists.txt: ${PATH}. Skipping...")
         return()
     endif()
 
@@ -226,7 +227,7 @@ function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     _abcmake_get_prop_dir(${PATH} "VERSION" version)
     set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
     if (NOT version)
-        _abcmake_log_warn(1 "Project ${PATH} does not have ABCMAKE version. Skipping...")
+        _abcmake_log_warn(1 "Not abcmake: ${PATH}. Link it manually.")
     endif()
 endfunction()
 
