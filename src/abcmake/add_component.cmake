@@ -2,17 +2,23 @@
 # add_component.cmake ==========================================================
 
 include(CMakeParseArguments)
+set(ABC_INSTALL_LIB_SUBDIR "lib")
+set(ABC_INSTALL_EXE_SUBDIR ".")
 
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
 function(_abc_AddComponents TARGETNAME)
+
+    # Get component directory
+    _get_abc_components(components)
+
     # List of possible subprojects
-    file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/components ${CMAKE_CURRENT_SOURCE_DIR}/components/*)
+    file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${components} ${CMAKE_CURRENT_SOURCE_DIR}/${components}/*)
     
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
-            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/components/${child})
+        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
+            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
         endif()
     endforeach()
     
@@ -29,9 +35,10 @@ endfunction()
 # Install the target near the build directory
 # @param TARGETNAME - name of the target to install
 # @param DESTINATION - path to the destination directory inside the install dir
-function(_target_install_near_build TARGETNAME DESTINATION)
+function(_target_install TARGETNAME DESTINATION)
     # install directory
-    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/../install"
+    _get_abc_install(install_dir)
+    set (CMAKE_INSTALL_PREFIX ${install_dir}
          CACHE PATH "default install path" FORCE)
     install(TARGETS ${TARGETNAME} DESTINATION ${DESTINATION})
 endfunction()
@@ -47,8 +54,6 @@ function(_target_init_abcmake TARGETNAME)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
 
-    message(STATUS "🔤src: ${arg_SOURCE_DIR}")
-    
     if (NOT arg_SOURCE_DIR)
         set(arg_SOURCE_DIR "src")
     endif()
@@ -64,12 +69,10 @@ function(_target_init_abcmake TARGETNAME)
     endif ()
     
     # Report version
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY 
-                 ABCMAKE_VERSION ${ABCMAKE_VERSION})
+    _set_abcprop_curdir("VERSION" ${ABCMAKE_VERSION})
                  
     # Add target to the target list
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} APPEND PROPERTY
-                 ABCMAKE_TARGETS ${TARGETNAME})
+    _append_abcprop_curdir("TARGETS" ${TARGETNAME})
     
     foreach(s ${arg_SOURCE_DIR})
         target_sources_directory(${TARGETNAME} ${s})
@@ -89,27 +92,28 @@ function(add_main_component TARGETNAME)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+
     
     if (NOT arg_SOURCE_DIR)
-        set(arg_SOURCE_DIR "src")
+        _get_abc_src(arg_SOURCE_DIR)
     endif()
     
     if (NOT arg_INCLUDE_DIR)
-        set(arg_INCLUDE_DIR "include")
+        _get_abc_include(arg_INCLUDE_DIR)
     endif()
     
     add_executable(${TARGETNAME})
     _target_init_abcmake(${TARGETNAME} 
                          INCLUDE_DIR ${arg_INCLUDE_DIR} 
                          SOURCE_DIR ${arg_SOURCE_DIR})
-    _target_install_near_build(${TARGETNAME} ".")
+    _target_install(${TARGETNAME} ${ABC_INSTALL_EXE_SUBDIR})
 endfunction()
 
 # Add a shared or static library component to the project
 # @param TARGETNAME - name of the target to add the component
 # @param INCLUDE_DIR - paths to the include directories
 # @param SOURCE_DIR - paths to the source directories
-# @param SHARED - if set, the library will be shared
+# @param SHARED - if set to TRUE, the library will be shared
 function(add_component TARGETNAME)
     set(flags SHARED)
     set(args)
@@ -117,11 +121,11 @@ function(add_component TARGETNAME)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
 
     if (NOT arg_SOURCE_DIR)
-        set(arg_SOURCE_DIR "src")
+        _get_abc_src(arg_SOURCE_DIR)
     endif()
 
     if (NOT arg_INCLUDE_DIR)
-        set(arg_INCLUDE_DIR "include")
+        _get_abc_include(arg_INCLUDE_DIR)
     endif()
 
     if (arg_SHARED)
@@ -133,7 +137,7 @@ function(add_component TARGETNAME)
     _target_init_abcmake(${TARGETNAME} 
                          INCLUDE_DIR ${arg_INCLUDE_DIR} 
                          SOURCE_DIR ${arg_SOURCE_DIR})
-    _target_install_near_build(${TARGETNAME} "lib")
+    _target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
 endfunction()
 
 
