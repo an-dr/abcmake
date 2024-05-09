@@ -393,7 +393,9 @@ endfunction()
 
 set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
-function(register_components COMPONENT_PATH)
+# Register a component by adding it to the registry
+# @param PATH - list of paths to the components
+function(register_components PATH)
 
     foreach(path ${ARGV})
         _abcmake_log_header("Register component")
@@ -445,7 +447,7 @@ endfunction()
 
 
 # ==============================================================================
-# target_link_component.cmake ==================================================
+# target_link_components.cmake =================================================
 
 # Link the component to the target
 #
@@ -459,17 +461,6 @@ function (_abcmake_target_link_component TARGETNAME COMPONENTPATH)
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
 endfunction()
-
-# Link the component to the target
-# DEPRECATED! Use target_link_components instead
-#
-# @param TARGETNAME - name of the target for linking
-# @param COMPONENTPATH - path to the component to link
-function (target_link_component TARGETNAME COMPONENTPATH)
-    message(STATUS "❌ target_link_component is DEPRECATED! Use `target_link_components` instead")
-    _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
-endfunction()
-
 
 # Link components to the target
 # @param TARGETNAME - name of the target for linking
@@ -505,6 +496,6 @@ function (target_link_components TARGETNAME)
     
 endfunction()
 
-# target_link_component.cmake ==================================================
+# target_link_components.cmake =================================================
 # ==============================================================================
 

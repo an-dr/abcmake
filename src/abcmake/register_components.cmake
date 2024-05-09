@@ -3,7 +3,9 @@
 
 set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
-function(register_components COMPONENT_PATH)
+# Register a component by adding it to the registry
+# @param PATH - list of paths to the components
+function(register_components PATH)
 
     foreach(path ${ARGV})
         _abcmake_log_header("Register component")

@@ -1,6 +1,6 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-5.4.0-green)
+![version](https://img.shields.io/badge/version-6.0.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
@@ -44,7 +44,8 @@ Default project structure
     - [Public Functions](#public-functions)
         - [add\_main\_component](#add_main_component)
         - [add\_component](#add_component)
-        - [target\_link\_component](#target_link_component)
+        - [register\_components](#register_components)
+        - [target\_link\_components](#target_link_components)
     - [Real Life Example (abcmake v5.1.1)](#real-life-example-abcmake-v511)
 
 ## Quick Start
@@ -73,7 +74,7 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-*The module provides three powerful functions, fully compatible with the standard CMake.*
+*The module provides several powerful functions, fully compatible with the standard CMake.*
 
 ### add_main_component
 
@@ -103,22 +104,41 @@ add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources
 
 Add a library target. If the `SHARED` keyword is present, the library will be shared, overwise it will be static.  Works similarly to `add_main_component`.
 
-### target_link_component
+### register_components
 
 ```cmake
-target_link_components (<target> <component_paths> ...)
+register_components(<path1> <path2> ...)
 ```
 
-Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`.
-
+Register components by their paths. This function is used to link components by name. For linking use the names defined by the `project()` function in the component's `CMakeLists.txt`.
 
 ```cmake
+# Registering components
+register_components(${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                    ${CMAKE_CURRENT_LIST_DIR}/libs/world)
+```
+
+### target_link_components
+
+```cmake
+target_link_components (<target> [PATH ] <component_paths> ... [NAME] <component_names> ...)
+```
+
+Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`. To be able to link components by name, they must be registered via `register_components` function.
+
+```cmake
+
 # Linking a component in the same folder
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
 
-# Linking many components
-target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
-                                       ${CMAKE_CURRENT_LIST_DIR}/libs/world)
+# Linking many components including registered ones
+register_components(${CMAKE_CURRENT_LIST_DIR}/common/FirstComponent 
+                    ${CMAKE_CURRENT_LIST_DIR}/common/SecondComponent)
+                    
+target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                                            ${CMAKE_CURRENT_LIST_DIR}/libs/world
+                                       NAME FirstComponent 
+                                            SecondComponent)
 ```
 
 ## Real Life Example (abcmake v5.1.1)
