@@ -1,21 +1,26 @@
 # ==============================================================================
 # abcmake_property.cmake =======================================================
 
-# List of the global abcmake properties:
-# - ABCMAKE_COMPONENTS_DIR
-# - ABCMAKE_SRC_DIR
-# - ABCMAKE_INCLUDE_DIR
-# - ABCMAKE_INSTALL_DIR
+# A change in any of these variables will cause a breaking change in the API!
 
-# Default prop values
-# ===================
-
-# A change in any of these variables will cause a breaking change in the API
 set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE_")
-set(ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
-set(ABCMAKE_DEFAULT_SRC_DIR "src")
-set(ABCMAKE_DEFAULT_INCLUDE_DIR "include")
-set(ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
+
+# Global properties:
+set(ABCMAKE_PROP_ADDED_PROJECTS "ADDED_PROJECTS") # The list of projects that have been added to the solution
+set(_ABCMAKE_PROP_COMPONENTS_DIR "COMPONENTS_DIR") # The directory where the components are stored
+set(_ABCMAKE_PROP_SRC_DIR "SRC_DIR") # The directory where the source files are stored
+set(_ABCMAKE_PROP_INCLUDE_DIR "INCLUDE_DIR") # The directory where the include files are stored
+set(_ABCMAKE_PROP_INSTALL_DIR "INSTALL_DIR") # The directory where the project will be installed
+
+# Directory-scope properties
+set(ABCMAKE_DIRPROP_VERSION "VERSION") # The abcmake version of the component
+set(ABCMAKE_DIRPROP_TARGETS "TARGETS") # The list of targets built by the component
+
+# Default values
+set(_ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
+set(_ABCMAKE_DEFAULT_SRC_DIR "src")
+set(_ABCMAKE_DEFAULT_INCLUDE_DIR "include")
+set(_ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
 
 
 # Setters
@@ -80,26 +85,26 @@ endfunction()
 # =================
 
 function(_abcmake_get_components OUT_VAR_NAME)
-    _abcmake_get_prop("COMPONENTS_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_COMPONENTS_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_COMPONENTS_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_COMPONENTS_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_src OUT_VAR_NAME)
-    _abcmake_get_prop("SRC_DIR" tmp_result  
-                 FALLBACK ${ABCMAKE_DEFAULT_SRC_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_SRC_DIR} tmp_result  
+                 FALLBACK ${_ABCMAKE_DEFAULT_SRC_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_include OUT_VAR_NAME)
-    _abcmake_get_prop("INCLUDE_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_INCLUDE_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_INCLUDE_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_INCLUDE_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_install OUT_VAR_NAME)
-    _abcmake_get_prop("INSTALL_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_INSTALL_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_INSTALL_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_INSTALL_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE) 
 endfunction()
 

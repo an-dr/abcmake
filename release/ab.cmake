@@ -27,67 +27,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # ----------------------------------------------------------------------------
 # Internal CMake modules
 # ----------------------------------------------------------------------------
-# ==============================================================================
-# _abcmake_add_project.cmake ====================================================
-
-# Add subdirectory to the project only if not added
-function(_abcmake_add_subdirectory PATH)
-
-    # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
-    _abcmake_get_prop("ADDED_PROJECTS" projects)
-    
-    # Resolve relative path
-    get_filename_component(PATH "${PATH}" ABSOLUTE)
-    
-    if (NOT PATH IN_LIST projects)
-        # Add PATH to the global list
-        _abcmake_set_prop("ADDED_PROJECTS" ${PATH})
-        
-        # Use the last directory name for a binary directory name 
-        get_filename_component(last_dir "${PATH}" NAME)
-        add_subdirectory(${PATH} abc_${last_dir})
-    endif()
-    
-endfunction()
-
-function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
-    if (EXISTS ${PATH}/CMakeLists.txt)
-        message(DEBUG "Adding project ${PATH}")
-        _abcmake_add_subdirectory(${PATH})
-        
-        _abcmake_get_prop_dir(${PATH} "VERSION" version)
-        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
-        if (NOT version)
-            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
-        endif()
-        
-    else()
-        message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
-    endif()
-endfunction()
-
-# _abcmake_add_project.cmake ====================================================
-# ==============================================================================
 
 # ==============================================================================
 # abcmake_property.cmake =======================================================
 
-# List of the global abcmake properties:
-# - ABCMAKE_COMPONENTS_DIR
-# - ABCMAKE_SRC_DIR
-# - ABCMAKE_INCLUDE_DIR
-# - ABCMAKE_INSTALL_DIR
+# A change in any of these variables will cause a breaking change in the API!
 
-# Default prop values
-# ===================
-
-# A change in any of these variables will cause a breaking change in the API
 set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE_")
-set(ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
-set(ABCMAKE_DEFAULT_SRC_DIR "src")
-set(ABCMAKE_DEFAULT_INCLUDE_DIR "include")
-set(ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
 
+# Global properties:
+set(ABCMAKE_PROP_ADDED_PROJECTS "ADDED_PROJECTS") # The list of projects that have been added to the solution
+set(_ABCMAKE_PROP_COMPONENTS_DIR "COMPONENTS_DIR") # The directory where the components are stored
+set(_ABCMAKE_PROP_SRC_DIR "SRC_DIR") # The directory where the source files are stored
+set(_ABCMAKE_PROP_INCLUDE_DIR "INCLUDE_DIR") # The directory where the include files are stored
+set(_ABCMAKE_PROP_INSTALL_DIR "INSTALL_DIR") # The directory where the project will be installed
+
+# Directory-scope properties
+set(ABCMAKE_DIRPROP_VERSION "VERSION") # The abcmake version of the component
+set(ABCMAKE_DIRPROP_TARGETS "TARGETS") # The list of targets built by the component
+
+# Default values
+set(_ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
+set(_ABCMAKE_DEFAULT_SRC_DIR "src")
+set(_ABCMAKE_DEFAULT_INCLUDE_DIR "include")
+set(_ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
 
 # Setters
 # =======
@@ -151,26 +114,26 @@ endfunction()
 # =================
 
 function(_abcmake_get_components OUT_VAR_NAME)
-    _abcmake_get_prop("COMPONENTS_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_COMPONENTS_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_COMPONENTS_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_COMPONENTS_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_src OUT_VAR_NAME)
-    _abcmake_get_prop("SRC_DIR" tmp_result  
-                 FALLBACK ${ABCMAKE_DEFAULT_SRC_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_SRC_DIR} tmp_result  
+                 FALLBACK ${_ABCMAKE_DEFAULT_SRC_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_include OUT_VAR_NAME)
-    _abcmake_get_prop("INCLUDE_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_INCLUDE_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_INCLUDE_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_INCLUDE_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
 endfunction()
 
 function(_abcmake_get_install OUT_VAR_NAME)
-    _abcmake_get_prop("INSTALL_DIR" tmp_result 
-                 FALLBACK ${ABCMAKE_DEFAULT_INSTALL_DIR})
+    _abcmake_get_prop(${_ABCMAKE_PROP_INSTALL_DIR} tmp_result 
+                 FALLBACK ${_ABCMAKE_DEFAULT_INSTALL_DIR})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE) 
 endfunction()
 
@@ -178,10 +141,53 @@ endfunction()
 # ==============================================================================
 
 
+# ==============================================================================
+# _abcmake_add_project.cmake ====================================================
+
+# Add subdirectory to the project only if not added
+function(_abcmake_add_subdirectory PATH)
+
+    # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
+    _abcmake_get_prop(${ABCMAKE_PROP_ADDED_PROJECTS} projects)
+    
+    # Resolve relative path
+    get_filename_component(PATH "${PATH}" ABSOLUTE)
+    
+    if (NOT PATH IN_LIST projects)
+        # Add PATH to the global list
+        _abcmake_set_prop(${ABCMAKE_PROP_ADDED_PROJECTS} ${PATH})
+        
+        # Use the last directory name for a binary directory name 
+        get_filename_component(last_dir "${PATH}" NAME)
+        add_subdirectory(${PATH} abc_${last_dir})
+    endif()
+    
+endfunction()
+
+function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
+    if (EXISTS ${PATH}/CMakeLists.txt)
+        message(DEBUG "Adding project ${PATH}")
+        _abcmake_add_subdirectory(${PATH})
+        
+        _abcmake_get_prop_dir(${PATH} "VERSION" version)
+        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
+        if (NOT version)
+            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
+        endif()
+        
+    else()
+        message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
+    endif()
+endfunction()
+
+# _abcmake_add_project.cmake ====================================================
+# ==============================================================================
+
 
 # ----------------------------------------------------------------------------
 # Public Functions
 # ----------------------------------------------------------------------------
+
 # ==============================================================================
 # add_component.cmake ==========================================================
 
@@ -253,10 +259,10 @@ function(_abcmake_target_init TARGETNAME)
     endif ()
     
     # Report version
-    _abcmake_set_prop_curdir("VERSION" ${ABCMAKE_VERSION})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
                  
     # Add target to the target list
-    _abcmake_append_prop_curdir("TARGETS" ${TARGETNAME})
+    _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
     
     foreach(s ${arg_SOURCE_DIR})
         target_sources_directory(${TARGETNAME} ${s})
@@ -330,6 +336,20 @@ endfunction()
 
 
 # ==============================================================================
+# component_register.cmake =====================================================
+
+
+function(register_component COMPONENT_PATH)
+
+endfunction()
+
+
+# component_register.cmake =====================================================
+# ==============================================================================
+
+
+
+# ==============================================================================
 # target_link_component.cmake ==================================================
 
 # Link the component to the target
@@ -340,7 +360,7 @@ endfunction()
 function (target_link_component TARGETNAME COMPONENTPATH)
     _abcmake_add_project(${COMPONENTPATH} ver)
     if (ver)
-        _abcmake_get_prop_dir(${COMPONENTPATH} "TARGETS" to_link)
+        _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()

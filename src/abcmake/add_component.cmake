@@ -69,10 +69,10 @@ function(_abcmake_target_init TARGETNAME)
     endif ()
     
     # Report version
-    _abcmake_set_prop_curdir("VERSION" ${ABCMAKE_VERSION})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
                  
     # Add target to the target list
-    _abcmake_append_prop_curdir("TARGETS" ${TARGETNAME})
+    _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
     
     foreach(s ${arg_SOURCE_DIR})
         target_sources_directory(${TARGETNAME} ${s})

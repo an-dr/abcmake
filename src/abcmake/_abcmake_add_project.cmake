@@ -5,14 +5,14 @@
 function(_abcmake_add_subdirectory PATH)
 
     # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
-    _abcmake_get_prop("ADDED_PROJECTS" projects)
+    _abcmake_get_prop(${ABCMAKE_PROP_ADDED_PROJECTS} projects)
     
     # Resolve relative path
     get_filename_component(PATH "${PATH}" ABSOLUTE)
     
     if (NOT PATH IN_LIST projects)
         # Add PATH to the global list
-        _abcmake_set_prop("ADDED_PROJECTS" ${PATH})
+        _abcmake_set_prop(${ABCMAKE_PROP_ADDED_PROJECTS} ${PATH})
         
         # Use the last directory name for a binary directory name 
         get_filename_component(last_dir "${PATH}" NAME)
