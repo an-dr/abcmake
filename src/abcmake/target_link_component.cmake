@@ -9,7 +9,7 @@
 function (target_link_component TARGETNAME COMPONENTPATH)
     _abcmake_add_project(${COMPONENTPATH} ver)
     if (ver)
-        _get_abcprop_dir(${COMPONENTPATH} "TARGETS" to_link)
+        _abcmake_get_prop_dir(${COMPONENTPATH} "TARGETS" to_link)
         message (STATUS "  ✅ Linking ${to_link} to ${TARGETNAME}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()

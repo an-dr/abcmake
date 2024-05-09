@@ -24,7 +24,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Internal CMake modules
 # ----------------------------------------------------------------------------
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_add_project.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/abcmake/abcmake_property.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_property.cmake)
 
 # ----------------------------------------------------------------------------
 # Public Functions

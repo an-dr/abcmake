@@ -31,7 +31,7 @@ include(CMakeParseArguments)
 
 # Add all projects from the components subdirectory
 # @param TARGETNAME - name of the target to add components
-function(_abc_AddComponents TARGETNAME)
+function(_abcmake_add_components TARGETNAME)
     # List of possible subprojects
     file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/components ${CMAKE_CURRENT_SOURCE_DIR}/components/*)
     
@@ -67,7 +67,7 @@ endfunction()
 # @param TARGETNAME - name of the target to initialize
 # @param INCLUDE_DIR - path to the include directory
 # @param SOURCE_DIR - path to the source directory
-function(_target_init_abcmake TARGETNAME)
+function(_abcmake_target_init TARGETNAME)
     set(flags)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
@@ -102,7 +102,7 @@ function(_target_init_abcmake TARGETNAME)
     endforeach()
     
     target_include_directories(${TARGETNAME} PUBLIC ${arg_INCLUDE_DIR})
-    _abc_AddComponents(${TARGETNAME})
+    _abcmake_add_components(${TARGETNAME})
 
 endfunction()
 
@@ -125,7 +125,7 @@ function(add_main_component TARGETNAME)
     endif()
     
     add_executable(${TARGETNAME})
-    _target_init_abcmake(${TARGETNAME} 
+    _abcmake_target_init(${TARGETNAME} 
                          INCLUDE_DIR ${arg_INCLUDE_DIR} 
                          SOURCE_DIR ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} ".")
@@ -156,7 +156,7 @@ function(add_component TARGETNAME)
         add_library(${TARGETNAME} STATIC)
     endif()
     
-    _target_init_abcmake(${TARGETNAME} 
+    _abcmake_target_init(${TARGETNAME} 
                          INCLUDE_DIR ${arg_INCLUDE_DIR} 
                          SOURCE_DIR ${arg_SOURCE_DIR})
     _target_install_near_build(${TARGETNAME} "lib")
