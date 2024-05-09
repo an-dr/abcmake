@@ -30,5 +30,4 @@ include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_property.cmake)
 # Public Functions
 # ----------------------------------------------------------------------------
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/add_component.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/abcmake/component_register.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/target_link_component.cmake)
