@@ -8,7 +8,7 @@ set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 function(register_components PATH)
 
     foreach(path ${ARGV})
-        _abcmake_log_header("Register component")
+        _abcmake_log_header(1 "Register component")
         message(DEBUG "  📂 Path: ${path}")
         _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
         if(PROJECT_ABCMAKE_VER)
@@ -16,7 +16,7 @@ function(register_components PATH)
             set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${path}")
             _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
             
-            _abcmake_log_ok(1 "Registered: ${component_name}")
+            _abcmake_log_ok(2 "Registered: ${component_name}")
         endif()
     endforeach()
     

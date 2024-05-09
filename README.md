@@ -112,6 +112,8 @@ register_components(<path1> <path2> ...)
 
 Register components by their paths. This function is used to link components by name. For linking use the names defined by the `project()` function in the component's `CMakeLists.txt`.
 
+NOTE: The order of registration is important, i.e. if component A depends on component B, component B should be registered first.
+
 ```cmake
 # Registering components
 register_components(${CMAKE_CURRENT_LIST_DIR}/libs/hello 

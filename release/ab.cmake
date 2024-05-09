@@ -15,8 +15,8 @@
 # Source Code: https://github.com/an-dr/abcmake
 # *************************************************************************
 
-set(ABCMAKE_VERSION_MAJOR 5)
-set(ABCMAKE_VERSION_MINOR 4)
+set(ABCMAKE_VERSION_MAJOR 6)
+set(ABCMAKE_VERSION_MINOR 0)
 set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
@@ -37,7 +37,7 @@ set(__ABCMAKE_COMPONENT "🔤")
 set(__ABCMAKE_OK "✅")
 set(__ABCMAKE_ERROR "❌")
 set(__ABCMAKE_WARNING "🔶")
-set(__ABCMAKE_NOTE "🗯️")
+set(__ABCMAKE_NOTE "⬜")
 
 
 function(_abcmake_log INDENTATION MESSAGE)
@@ -61,8 +61,8 @@ function(_abcmake_log_note INDENTATION MESSAGE)
     _abcmake_log(${INDENTATION} "${__ABCMAKE_NOTE} ${MESSAGE}")
 endfunction()
 
-function(_abcmake_log_header MESSAGE)
-    _abcmake_log(0 "${__ABCMAKE_COMPONENT} ${MESSAGE}")
+function(_abcmake_log_header INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_COMPONENT} ${MESSAGE}")
 endfunction()
 
 
@@ -305,7 +305,7 @@ function(_abcmake_target_init TARGETNAME)
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
     if (NOT hasParent)
-        _abcmake_log_header("Main project: ${TARGETNAME}")
+        _abcmake_log_header(0 "Main project: ${TARGETNAME}")
     endif ()
     
     # Report version
@@ -398,7 +398,7 @@ set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 function(register_components PATH)
 
     foreach(path ${ARGV})
-        _abcmake_log_header("Register component")
+        _abcmake_log_header(1 "Register component")
         message(DEBUG "  📂 Path: ${path}")
         _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
         if(PROJECT_ABCMAKE_VER)
@@ -406,7 +406,7 @@ function(register_components PATH)
             set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${path}")
             _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
             
-            _abcmake_log_ok(1 "Registered: ${component_name}")
+            _abcmake_log_ok(2 "Registered: ${component_name}")
         endif()
     endforeach()
     
@@ -482,12 +482,13 @@ function (target_link_components TARGETNAME)
     
     # Link components by name
     foreach(NAME ${arg_NAME})
+        set(reg_path "") # reset the variable
         _abcmake_get_from_registry(${NAME} reg_path)
         if (reg_path)
             message ( DEBUG "Found component: ${NAME} -> ${reg_path}")
             _abcmake_target_link_component(${TARGETNAME} ${reg_path})
         else()
-            _abcmake_log_err(0 "Component ${NAME} not found in the registry")
+            _abcmake_log_err(0 "${NAME} not found in the component registry!")
             _abcmake_log(1 "Use `register_components` to add it to the registry")
             message (FATAL_ERROR "Component ${NAME} not found in the registry")
         endif()

@@ -7,7 +7,7 @@ set(__ABCMAKE_COMPONENT "🔤")
 set(__ABCMAKE_OK "✅")
 set(__ABCMAKE_ERROR "❌")
 set(__ABCMAKE_WARNING "🔶")
-set(__ABCMAKE_NOTE "🗯️")
+set(__ABCMAKE_NOTE "⬜")
 
 
 function(_abcmake_log INDENTATION MESSAGE)
@@ -31,8 +31,8 @@ function(_abcmake_log_note INDENTATION MESSAGE)
     _abcmake_log(${INDENTATION} "${__ABCMAKE_NOTE} ${MESSAGE}")
 endfunction()
 
-function(_abcmake_log_header MESSAGE)
-    _abcmake_log(0 "${__ABCMAKE_COMPONENT} ${MESSAGE}")
+function(_abcmake_log_header INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_COMPONENT} ${MESSAGE}")
 endfunction()
 
 

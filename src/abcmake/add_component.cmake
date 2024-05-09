@@ -65,7 +65,7 @@ function(_abcmake_target_init TARGETNAME)
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
     if (NOT hasParent)
-        _abcmake_log_header("Main project: ${TARGETNAME}")
+        _abcmake_log_header(0 "Main project: ${TARGETNAME}")
     endif ()
     
     # Report version
