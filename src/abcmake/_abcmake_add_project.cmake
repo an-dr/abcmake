@@ -23,7 +23,8 @@ endfunction()
 
 function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     if (NOT EXISTS ${PATH})
-        message (FATAL_ERROR "  ❌ Path \"${PATH}\" does not exist. Exiting...")
+        message (STATUS "  ❌ Path \"${PATH}\" does not exist!")
+        return()
     endif()
     
     if (NOT EXISTS ${PATH}/CMakeLists.txt)

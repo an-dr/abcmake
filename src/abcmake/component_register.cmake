@@ -19,15 +19,17 @@ function (_split_component_entry COMPONENT_ENTRY OUT_NAME OUT_PATH)
     if(sep_pos EQUAL -1)
         message(FATAL_ERROR "Invalid component entry: ${COMPONENT_ENTRY}")
     endif()
-    math(EXPR sep_pos "${sep_pos}+${#__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}")
-    string(SUBSTRING ${COMPONENT_ENTRY} 0 ${sep_pos} ${name})
-    string(SUBSTRING ${COMPONENT_ENTRY} ${sep_pos} -1 ${path})
+    
+    string(REGEX MATCH "^(.+)${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}(.+)"
+           ENTRY_MATCH ${COMPONENT_ENTRY})
+    set(name ${CMAKE_MATCH_1})
+    set(path ${CMAKE_MATCH_2})
     
     set(${OUT_NAME} ${name} PARENT_SCOPE)
     set(${OUT_PATH} ${path} PARENT_SCOPE)
 endfunction()
 
-function (_get_from_registry COMPONENT_NAME OUT_PATH)
+function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     _abcmake_get_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} registry)
     foreach(entry ${registry})
         _split_component_entry(${entry} name path)

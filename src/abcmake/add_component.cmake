@@ -18,7 +18,7 @@ function(_abcmake_add_components TARGETNAME)
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
-            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
+            target_link_components(${TARGETNAME} COMPONENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
         endif()
     endforeach()
     
