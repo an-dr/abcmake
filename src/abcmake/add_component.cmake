@@ -70,7 +70,10 @@ function(_abcmake_target_init TARGETNAME)
     
     # Report version
     _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
-                 
+    
+    # Set name
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_COMPONENT_NAME} ${PROJECT_NAME})
+    
     # Add target to the target list
     _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
     

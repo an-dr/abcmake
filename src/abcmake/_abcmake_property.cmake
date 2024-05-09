@@ -7,6 +7,7 @@ set(ABCMAKE_PROPERTY_PREFIX "ABCMAKE_")
 
 # Global properties:
 set(ABCMAKE_PROP_ADDED_PROJECTS "ADDED_PROJECTS") # The list of projects that have been added to the solution
+set(ABCMAKE_PROP_COMPONENT_REGISTRY "COPONENT_REGISTRY") # Component registry
 set(_ABCMAKE_PROP_COMPONENTS_DIR "COMPONENTS_DIR") # The directory where the components are stored
 set(_ABCMAKE_PROP_SRC_DIR "SRC_DIR") # The directory where the source files are stored
 set(_ABCMAKE_PROP_INCLUDE_DIR "INCLUDE_DIR") # The directory where the include files are stored
@@ -14,6 +15,7 @@ set(_ABCMAKE_PROP_INSTALL_DIR "INSTALL_DIR") # The directory where the project w
 
 # Directory-scope properties
 set(ABCMAKE_DIRPROP_VERSION "VERSION") # The abcmake version of the component
+set(ABCMAKE_DIRPROP_COMPONENT_NAME "COMPONENT_NAME") # The name of the component (local PROJECT_NAME)
 set(ABCMAKE_DIRPROP_TARGETS "TARGETS") # The list of targets built by the component
 
 # Default values

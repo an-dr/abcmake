@@ -22,18 +22,22 @@ function(_abcmake_add_subdirectory PATH)
 endfunction()
 
 function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
-    if (EXISTS ${PATH}/CMakeLists.txt)
-        message(DEBUG "Adding project ${PATH}")
-        _abcmake_add_subdirectory(${PATH})
-        
-        _abcmake_get_prop_dir(${PATH} "VERSION" version)
-        set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
-        if (NOT version)
-            message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
-        endif()
-        
-    else()
+    if (NOT EXISTS ${PATH})
+        message (FATAL_ERROR "  ❌ Path \"${PATH}\" does not exist. Exiting...")
+    endif()
+    
+    if (NOT EXISTS ${PATH}/CMakeLists.txt)
         message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
+        return()
+    endif()
+
+    message(DEBUG "Adding project ${PATH}")
+    _abcmake_add_subdirectory(${PATH})
+    
+    _abcmake_get_prop_dir(${PATH} "VERSION" version)
+    set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
+    if (NOT version)
+        message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
     endif()
 endfunction()
 
