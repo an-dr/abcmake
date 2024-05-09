@@ -36,9 +36,8 @@
                 "problemMatcher": []
                 
             },
-            // Cmake build
             {
-                "label": "project: Configure",
+                "label": "Configure",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -53,7 +52,7 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project",
+                    "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
                         "ABCMAKE_PATH": "${workspaceFolder}/src"
                     }
@@ -62,7 +61,7 @@
             },
             // Cmake build
             {
-                "label": "project: Build",
+                "label": "Build",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -78,13 +77,13 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project"
+                    "cwd": "${workspaceFolder}/tests/${input:test}"
                 },
                 "problemMatcher": [],
             },
             // Install to workspace/install
             {
-                "label": "project: Install",
+                "label": "Install",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -96,72 +95,22 @@
                     "isDefault": true
                 },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/project",
+                    "cwd": "${workspaceFolder}/tests/${input:test}",
                 },
                 "problemMatcher": [],
-            },
+            }
+        ]
+        "inputs": [
             {
-                "label": "project_custom: Configure",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "-G",
-                    "Ninja",
-                    "-B",
-                    "build",
-                    "-S ."
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/project_custom",
-                    "env": {
-                        "ABCMAKE_PATH": "${workspaceFolder}/src"
-                    }
-                },
-                "problemMatcher": []
-            },
-            // Cmake build
-            {
-                "label": "project_custom: Build",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--build",
-                    "build",
-                    "--target",
-                    "all",
-                    "--config",
-                    "Release"
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/project_custom"
-                },
-                "problemMatcher": [],
-            },
-            // Install to workspace/install
-            {
-                "label": "project_custom: Install",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--install",
-                    "build",
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/project_custom",
-                },
-                "problemMatcher": [],
+                "type": "pickString",
+                "id": "test",
+                "description": "Select test",
+                "default": "test_default_project",
+                "options": [
+                    { "value": "test_default_project", },
+                    { "value": "test_compile_commands" },
+                    { "value": "test_many_folders" },
+                ]
             }
         ]
     }
