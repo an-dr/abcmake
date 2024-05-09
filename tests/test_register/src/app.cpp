@@ -9,6 +9,7 @@
 
 #include "hello.hpp"
 #include "world.hpp"
+#include "exclamation.hpp"
 
 #include "app.hpp"
 
@@ -16,4 +17,5 @@ void app()
 {
     hello();
     world();
+    exclamation();
 }
