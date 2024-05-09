@@ -24,12 +24,12 @@ endfunction()
 
 function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     if (NOT EXISTS ${PATH})
-        message (STATUS "  ❌ Path \"${PATH}\" does not exist!")
+        _abcmake_log_err(1 "Path \"${PATH}\" does not exist!")
         return()
     endif()
     
     if (NOT EXISTS ${PATH}/CMakeLists.txt)
-        message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
+        _abcmake_log_note(1 "Path \"${PATH}\" is not a CMake project. Skipping...")
         return()
     endif()
 
@@ -39,7 +39,7 @@ function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     _abcmake_get_prop_dir(${PATH} "VERSION" version)
     set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
     if (NOT version)
-        message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
+        _abcmake_log_warn(1 "Project ${PATH} does not have ABCMAKE version. Skipping...")
     endif()
 endfunction()
 

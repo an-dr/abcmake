@@ -1,6 +1,6 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-5.3.1-green)
+![version](https://img.shields.io/badge/version-5.4.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.

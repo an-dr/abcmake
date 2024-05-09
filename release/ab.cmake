@@ -16,8 +16,8 @@
 # *************************************************************************
 
 set(ABCMAKE_VERSION_MAJOR 5)
-set(ABCMAKE_VERSION_MINOR 3)
-set(ABCMAKE_VERSION_PATCH 1)
+set(ABCMAKE_VERSION_MINOR 4)
+set(ABCMAKE_VERSION_PATCH 0)
 set(ABCMAKE_VERSION "${ABCMAKE_VERSION_MAJOR}.${ABCMAKE_VERSION_MINOR}.${ABCMAKE_VERSION_PATCH}")
 
 
@@ -27,6 +27,47 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # ----------------------------------------------------------------------------
 # Internal CMake modules
 # ----------------------------------------------------------------------------
+
+# ==============================================================================
+# _abcmake_log.cmake.cmake =====================================================
+
+set(__ABCMAKE_INDENTATION "  ")
+
+set(__ABCMAKE_COMPONENT "🔤")
+set(__ABCMAKE_OK "✅")
+set(__ABCMAKE_ERROR "❌")
+set(__ABCMAKE_WARNING "🔶")
+set(__ABCMAKE_NOTE "🗯️")
+
+
+function(_abcmake_log INDENTATION MESSAGE)
+    string(REPEAT ${__ABCMAKE_INDENTATION} ${INDENTATION} indentation)
+    message(STATUS "${indentation}${MESSAGE}")
+endfunction()
+
+function(_abcmake_log_ok INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_OK} ${MESSAGE}")
+endfunction()
+
+function(_abcmake_log_err INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_ERROR} ${MESSAGE}")
+endfunction()
+
+function(_abcmake_log_warn INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_WARNING} ${MESSAGE}")
+endfunction()
+
+function(_abcmake_log_note INDENTATION MESSAGE)
+    _abcmake_log(${INDENTATION} "${__ABCMAKE_NOTE} ${MESSAGE}")
+endfunction()
+
+function(_abcmake_log_header MESSAGE)
+    _abcmake_log(0 "${__ABCMAKE_COMPONENT} ${MESSAGE}")
+endfunction()
+
+
+# _abcmake_log.cmake.cmake =====================================================
+# ==============================================================================
 
 # ==============================================================================
 # abcmake_property.cmake =======================================================
@@ -170,12 +211,12 @@ endfunction()
 
 function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     if (NOT EXISTS ${PATH})
-        message (STATUS "  ❌ Path \"${PATH}\" does not exist!")
+        _abcmake_log_err(1 "Path \"${PATH}\" does not exist!")
         return()
     endif()
     
     if (NOT EXISTS ${PATH}/CMakeLists.txt)
-        message (STATUS "  ⬜ ${PATH} is not a CMake project. Skipping...")
+        _abcmake_log_note(1 "Path \"${PATH}\" is not a CMake project. Skipping...")
         return()
     endif()
 
@@ -185,7 +226,7 @@ function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
     _abcmake_get_prop_dir(${PATH} "VERSION" version)
     set(${OUT_ABCMAKE_VER} ${version} PARENT_SCOPE)
     if (NOT version)
-        message (STATUS "  🔶 ${PATH} is not an ABCMAKE project. Link it manually.")
+        _abcmake_log_warn(1 "Project ${PATH} does not have ABCMAKE version. Skipping...")
     endif()
 endfunction()
 
@@ -217,7 +258,7 @@ function(_abcmake_add_components TARGETNAME)
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
-            target_link_components(${TARGETNAME} COMPONENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
+            target_link_components(${TARGETNAME} PATH ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
         endif()
     endforeach()
     
@@ -264,7 +305,7 @@ function(_abcmake_target_init TARGETNAME)
     get_directory_property(hasParent PARENT_DIRECTORY)
     # if no parent, print the name of the target
     if (NOT hasParent)
-        message(STATUS "🔤 ${TARGETNAME}")
+        _abcmake_log_header("Main project: ${TARGETNAME}")
     endif ()
     
     # Report version
@@ -348,19 +389,25 @@ endfunction()
 
 
 # ==============================================================================
-# component_register.cmake =====================================================
+# register_components.cmake ====================================================
 
 set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
-function(register_component COMPONENT_PATH)
-    _abcmake_add_project(${COMPONENT_PATH} PROJECT_ABCMAKE_VER)
-    if(PROJECT_ABCMAKE_VER)
-        _abcmake_get_prop_dir(${COMPONENT_PATH} ${ABCMAKE_DIRPROP_COMPONENT_NAME} component_name)
-        set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${COMPONENT_PATH}")
-        
-        _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
-        message(STATUS "Component registered: ${component_name}")
-    endif()
+function(register_components COMPONENT_PATH)
+
+    foreach(path ${ARGV})
+        _abcmake_log_header("Register component")
+        message(DEBUG "  📂 Path: ${path}")
+        _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
+        if(PROJECT_ABCMAKE_VER)
+            _abcmake_get_prop_dir(${path} ${ABCMAKE_DIRPROP_COMPONENT_NAME} component_name)
+            set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${path}")
+            _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
+            
+            _abcmake_log_ok(1 "Registered: ${component_name}")
+        endif()
+    endforeach()
+    
 endfunction()
 
 # Splits into COMPONENT_ENTRY into COMPONENT_NAME and COMPONENT_PATH
@@ -382,6 +429,7 @@ endfunction()
 # Gets the path of a component from the registry. Returns null if not found.
 function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     _abcmake_get_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} registry)
+    message(DEBUG "Get ${COMPONENT_NAME} from : ${registry}")
     foreach(entry ${registry})
         _split_component_entry(${entry} name path)
         if(name STREQUAL COMPONENT_NAME)
@@ -391,7 +439,7 @@ function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     endforeach()
 endfunction()
     
-# component_register.cmake =====================================================
+# register_components.cmake ====================================================
 # ==============================================================================
 
 
@@ -407,7 +455,7 @@ function (_abcmake_target_link_component TARGETNAME COMPONENTPATH)
     _abcmake_add_project(${COMPONENTPATH} ver)
     if (ver)
         _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
-        message (STATUS "  ✅ Linking to ${TARGETNAME}: ${to_link}")
+        _abcmake_log_ok(1 "Linking to ${TARGETNAME}: ${to_link}")
         target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
     endif()
 endfunction()
@@ -425,26 +473,36 @@ endfunction()
 
 # Link components to the target
 # @param TARGETNAME - name of the target for linking
-# @param COMPONENT_DIR - paths to components to link
-# @param COMPONENT_NAME - names of components to link
+# @param PATH - paths to components to link
+# @param NAME - names of components to link
 function (target_link_components TARGETNAME)
     set(flags)
     set(args)
-    set(listArgs COMPONENT_DIR COMPONENT_NAME)
+    set(listArgs PATH NAME)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
     
-    foreach(COMPONENTPATH ${arg_COMPONENT_DIR})
-        _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    message(DEBUG "target_link_components arg_PATH: ${arg_PATH}")
+    message(DEBUG "target_link_components arg_NAME: ${arg_NAME}")
+    
+    # Link components by path
+    foreach(PATH ${arg_PATH})
+        _abcmake_target_link_component(${TARGETNAME} ${PATH})
     endforeach()
     
     # Link components by name
-    foreach(NAME ${arg_COMPONENT_NAME})
-        _abcmake_get_from_registry(${NAME} COMPONENTPATH)
-        if (COMPONENTPATH)
-            message ( DEBUG "Found component: ${NAME} -> ${COMPONENTPATH}")
-            _abcmake_target_link_component(${TARGETNAME} ${COMPONENTPATH})
+    foreach(NAME ${arg_NAME})
+        _abcmake_get_from_registry(${NAME} reg_path)
+        if (reg_path)
+            message ( DEBUG "Found component: ${NAME} -> ${reg_path}")
+            _abcmake_target_link_component(${TARGETNAME} ${reg_path})
+        else()
+            _abcmake_log_err(0 "Component ${NAME} not found in the registry")
+            _abcmake_log(1 "Use `register_components` to add it to the registry")
+            message (FATAL_ERROR "Component ${NAME} not found in the registry")
         endif()
     endforeach()
+    
+    
 endfunction()
 
 # target_link_component.cmake ==================================================

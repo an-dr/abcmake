@@ -1,12 +1,12 @@
 # ==============================================================================
-# component_register.cmake =====================================================
+# register_components.cmake ====================================================
 
 set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 
-function(register_component COMPONENT_PATH)
+function(register_components COMPONENT_PATH)
 
     foreach(path ${ARGV})
-        message(STATUS "🔤 Register component")
+        _abcmake_log_header("Register component")
         message(DEBUG "  📂 Path: ${path}")
         _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
         if(PROJECT_ABCMAKE_VER)
@@ -14,8 +14,7 @@ function(register_component COMPONENT_PATH)
             set(new_entry "${component_name}${__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR}${path}")
             _abcmake_append_prop(${ABCMAKE_PROP_COMPONENT_REGISTRY} ${new_entry})
             
-            message(STATUS "  ✅ Registered: ${component_name}")
-            
+            _abcmake_log_ok(1 "Registered: ${component_name}")
         endif()
     endforeach()
     
@@ -50,7 +49,7 @@ function (_abcmake_get_from_registry COMPONENT_NAME OUT_PATH)
     endforeach()
 endfunction()
     
-# component_register.cmake =====================================================
+# register_components.cmake ====================================================
 # ==============================================================================
 
 
