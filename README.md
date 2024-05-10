@@ -5,38 +5,11 @@
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
 
-The module is designed to simplify the process of creating and linking components in a project. The module works best with small and medium-sized projects.
+The module is designed to simplify the process of creating and linking components in a project. The view on a source code as a set of component increases the code portability and reusability. The module works best with small and medium-sized projects.
 
 [![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
 
-The default project structure is shown below but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
-
-```
-Default project structure
--------------------------
-
-+📁Root Project
-|
-|--+📁components    <------- nested abcmake projects
-|  |
-|  |--+📁component1
-|  |  |---📁include    <---- public headers
-|  |  |---📁components
-|  |  |---📁src    <-------- src and private headers
-|  |  |---ab.cmake
-|  |  '--CMakeLists.txt
-|  |
-|  |--+📁component2
-|  ...
-|
-|---📁include
-|---📁src
-|---ab.cmake
-'--CMakeLists.txt
-```
-
 ## Table of Contents
-
 
 - [abcmake - Simple CMake for Simple Projects](#abcmake---simple-cmake-for-simple-projects)
     - [Table of Contents](#table-of-contents)
@@ -50,6 +23,32 @@ Default project structure
         - [ABCMAKE\_EMOJI](#abcmake_emoji)
 
 ## Quick Start
+
+The simplest way of using the module is to use the default project structure:
+
+```
+Default project structure
+-------------------------
+
++📁Root Project
+|
+|--+📁components    <------- nested abcmake projects
+|  |
+|  |--+📁component1
+|  |  |---📁include
+|  |  |---📁components
+|  |  |---📁src
+|  |  |---ab.cmake
+|  |  '--CMakeLists.txt
+|  |
+|  |--+📁component2
+|  ...
+|
+|---📁include    <---- public headers
+|---📁src    <-------- src and private headers
+|---ab.cmake
+'--CMakeLists.txt
+```
 
 1. Create a folder i.e. `PROJECT_NAME`
 2. Move all headers and sources to `PROJECT_NAME/include` and `PROJECT_NAME/src` folders respectively. All headers from `include` will be accessible to the parent project.
@@ -75,7 +74,7 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-*The module provides several powerful functions, fully compatible with the standard CMake.*
+The module provides several powerful functions to work with the source code as a set of portable interdependent components.
 
 ### add_main_component
 
