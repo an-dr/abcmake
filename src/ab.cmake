@@ -18,16 +18,21 @@
 include(${CMAKE_CURRENT_LIST_DIR}/version.cmake)
 
 # Configure CMake
+set(ABCMAKE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # ----------------------------------------------------------------------------
 # Internal CMake modules
 # ----------------------------------------------------------------------------
-include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_add_project.cmake)
+
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_log.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_property.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/_abcmake_add_project.cmake)
 
 # ----------------------------------------------------------------------------
 # Public Functions
 # ----------------------------------------------------------------------------
+
 include(${CMAKE_CURRENT_LIST_DIR}/abcmake/add_component.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/abcmake/target_link_component.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/register_components.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/abcmake/target_link_components.cmake)

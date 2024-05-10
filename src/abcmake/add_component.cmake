@@ -6,8 +6,9 @@ set(ABC_INSTALL_LIB_SUBDIR "lib")
 set(ABC_INSTALL_EXE_SUBDIR ".")
 
 # Add all projects from the components subdirectory
+# @param PROCESS_LEVEL - level of the recursion
 # @param TARGETNAME - name of the target to add components
-function(_abcmake_add_components TARGETNAME)
+function(_abcmake_add_components PROCESS_LEVEL TARGETNAME)
 
     # Get component directory
     _abcmake_get_components(components)
@@ -18,7 +19,9 @@ function(_abcmake_add_components TARGETNAME)
     # Link all subprojects to the ${TARGETNAME}
     foreach(child ${children})
         if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
-            target_link_component(${TARGETNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
+            _abcmake_target_link_components(${PROCESS_LEVEL} 
+                                            ${TARGETNAME} 
+                                            PATH ${CMAKE_CURRENT_SOURCE_DIR}/${components}/${child})
         endif()
     endforeach()
     
@@ -44,6 +47,17 @@ function(_abcmake_target_install TARGETNAME DESTINATION)
 endfunction()
 
 
+function(_abcmake_count_parents OUT_PARENT_NUM)
+    set(PARENT_NUM 0)
+    get_directory_property(parent PARENT_DIRECTORY)
+    while (parent)
+        math(EXPR PARENT_NUM "${PARENT_NUM} + 1")
+        set(parent "")
+        get_directory_property(hasParent PARENT_DIRECTORY)
+    endwhile()
+    set(${OUT_PARENT_NUM} ${PARENT_NUM} PARENT_SCOPE)
+endfunction()
+
 # Add to the project all files from ./src, ./include, ./lib
 # @param TARGETNAME - name of the target to initialize
 # @param INCLUDE_DIR - path to the include directory
@@ -62,24 +76,28 @@ function(_abcmake_target_init TARGETNAME)
         set(arg_INCLUDE_DIR "include")
     endif()
 
-    get_directory_property(hasParent PARENT_DIRECTORY)
+    _abcmake_count_parents(parents_num)
+    set(process_level ${parents_num})
     # if no parent, print the name of the target
-    if (NOT hasParent)
-        message(STATUS "🔤 ${TARGETNAME}")
+    if (parents_num EQUAL 0)
+        _abcmake_log_header(${process_level} "${TARGETNAME}")
     endif ()
     
     # Report version
-    _abcmake_set_prop_curdir("VERSION" ${ABCMAKE_VERSION})
-                 
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
+    
+    # Set name
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_COMPONENT_NAME} ${PROJECT_NAME})
+    
     # Add target to the target list
-    _abcmake_append_prop_curdir("TARGETS" ${TARGETNAME})
+    _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
     
     foreach(s ${arg_SOURCE_DIR})
         target_sources_directory(${TARGETNAME} ${s})
     endforeach()
     
     target_include_directories(${TARGETNAME} PUBLIC ${arg_INCLUDE_DIR})
-    _abcmake_add_components(${TARGETNAME})
+    _abcmake_add_components(${process_level} ${TARGETNAME})
 
 endfunction()
 
@@ -119,6 +137,7 @@ function(add_component TARGETNAME)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+    message(DEBUG "add_component: ${TARGETNAME}")
 
     if (NOT arg_SOURCE_DIR)
         _abcmake_get_src(arg_SOURCE_DIR)
@@ -139,7 +158,6 @@ function(add_component TARGETNAME)
                          SOURCE_DIR ${arg_SOURCE_DIR})
     _abcmake_target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
 endfunction()
-
 
 # add_component.cmake ==========================================================
 # ==============================================================================

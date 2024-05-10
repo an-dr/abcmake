@@ -1,15 +1,30 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-5.3.1-green)
+![version](https://img.shields.io/badge/version-6.0.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
 
-The module is designed to simplify the process of creating and linking components in a project. The module works best with small and medium-sized projects.
+The module is designed to simplify the process of creating and linking components in a project. The view on a source code as a set of component increases the code portability and reusability. The module works best with small and medium-sized projects.
 
 [![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
 
-The default project structure is shown below but can be customized up to your needs. Components can be interdependent and can be linked to each other. The module will take care of the linking process.
+## Table of Contents
+
+- [abcmake - Simple CMake for Simple Projects](#abcmake---simple-cmake-for-simple-projects)
+    - [Table of Contents](#table-of-contents)
+    - [Quick Start](#quick-start)
+    - [Public Functions](#public-functions)
+        - [add\_main\_component](#add_main_component)
+        - [add\_component](#add_component)
+        - [register\_components](#register_components)
+        - [target\_link\_components](#target_link_components)
+    - [Configuration](#configuration)
+        - [ABCMAKE\_EMOJI](#abcmake_emoji)
+
+## Quick Start
+
+The simplest way of using the module is to use the default project structure:
 
 ```
 Default project structure
@@ -20,34 +35,20 @@ Default project structure
 |--+📁components    <------- nested abcmake projects
 |  |
 |  |--+📁component1
-|  |  |---📁include    <---- public headers
+|  |  |---📁include
 |  |  |---📁components
-|  |  |---📁src    <-------- src and private headers
+|  |  |---📁src
 |  |  |---ab.cmake
 |  |  '--CMakeLists.txt
 |  |
 |  |--+📁component2
 |  ...
 |
-|---📁include
-|---📁src
+|---📁include    <---- public headers
+|---📁src    <-------- src and private headers
 |---ab.cmake
 '--CMakeLists.txt
 ```
-
-## Table of Contents
-
-
-- [abcmake - Simple CMake for Simple Projects](#abcmake---simple-cmake-for-simple-projects)
-    - [Table of Contents](#table-of-contents)
-    - [Quick Start](#quick-start)
-    - [Public Functions](#public-functions)
-        - [add\_main\_component](#add_main_component)
-        - [add\_component](#add_component)
-        - [target\_link\_component](#target_link_component)
-    - [Real Life Example (abcmake v5.1.1)](#real-life-example-abcmake-v511)
-
-## Quick Start
 
 1. Create a folder i.e. `PROJECT_NAME`
 2. Move all headers and sources to `PROJECT_NAME/include` and `PROJECT_NAME/src` folders respectively. All headers from `include` will be accessible to the parent project.
@@ -73,7 +74,7 @@ If you want to use the module in your project, you can use the badge:
 
 ## Public Functions
 
-*The module provides three powerful functions, fully compatible with the standard CMake.*
+The module provides several powerful functions to work with the source code as a set of portable interdependent components.
 
 ### add_main_component
 
@@ -103,118 +104,57 @@ add_component(<name> [SHARED] [INCLUDE_DIR] <includes> ... [SOURCE_DIR] <sources
 
 Add a library target. If the `SHARED` keyword is present, the library will be shared, overwise it will be static.  Works similarly to `add_main_component`.
 
-### target_link_component
+### register_components
 
 ```cmake
-target_link_components (<target> <component_paths> ...)
+register_components(<path1> <path2> ...)
 ```
 
-Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`.
+Register components by their paths. This function is used to link components by name. For linking use the names defined by the `project()` function in the component's `CMakeLists.txt`.
 
+NOTE: The order of registration is important, i.e. if component A depends on component B, component B should be registered first.
 
 ```cmake
+# Registering components
+register_components(${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                    ${CMAKE_CURRENT_LIST_DIR}/libs/world)
+```
+
+### target_link_components
+
+```cmake
+target_link_components (<target> [PATH] <component_paths> ... [NAME] <component_names> ...)
+```
+
+Add components to the target. Can be used for linking components from custom directories and linking components between each other. Accepts a list of values. For relative paths, use `${CMAKE_CURRENT_LIST_DIR}`. To be able to link components by name, they must be registered via `register_components` function.
+
+```cmake
+
 # Linking a component in the same folder
 target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/../my_component)
 
-# Linking many components
-target_link_components(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
-                                       ${CMAKE_CURRENT_LIST_DIR}/libs/world)
+# Linking many components including registered ones
+register_components(${CMAKE_CURRENT_LIST_DIR}/common/FirstComponent 
+                    ${CMAKE_CURRENT_LIST_DIR}/common/SecondComponent)
+                    
+target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello 
+                                            ${CMAKE_CURRENT_LIST_DIR}/libs/world
+                                       NAME FirstComponent 
+                                            SecondComponent)
 ```
 
-## Real Life Example (abcmake v5.1.1)
+## Configuration
 
-Let's see the file structure of one of my projects:
+The module can be configured by setting environment variables:
 
-```txt
-📦VisioneR
- |--+📁components
- |  |--+📁object_finder
- |  |  |--+📁include
- |  |  |  '--ObjectFinder.hpp
- |  |  |--+📁src
- |  |  |  '--ObjectFinder.cpp
- |  |  '--🔷CMakeLists.txt
- |  |
- |  '--+📁visioner_base
- |  |  |--+📁include
- |  |  |  '--+📁App
- |  |  |  |  |--App.hpp
- |  |  |  |  |--FaceInterface.hpp
- |  |  |  |  '--InputInterface.hpp
- |  |  |--+📁src
- |  |  |  '--App.cpp
- |  |  |--🔷CMakeLists.txt
- |  |  '--README.md
- |  | 
- |--+📁src
- |  |--+📁VisionerFile
- |  |  |--AppVisioner.cpp
- |  |  |--AppVisioner.hpp
- |  |  |--Face.cpp
- |  |  |--Face.hpp
- |  |  |--FileScanner.cpp
- |  |  |--FileScanner.hpp
- |  |  |--InputFiles.cpp
- |  |  |--InputFiles.hpp
- |  |  |--README.md
- |  |  '--main.cpp
- |  '--+📁VisionerWebcam
- |  |  |--AppVisioner.cpp
- |  |  |--AppVisioner.hpp
- |  |  |--Face.cpp
- |  |  |--Face.hpp
- |  |  |--FileScanner.cpp
- |  |  |--FileScanner.hpp
- |  |  |--InputWebcam.cpp
- |  |  |--InputWebcam.hpp
- |  |  '--main.cpp
- |--🔷CMakeLists.txt
- '--ab.cmake
- ```
+### ABCMAKE_EMOJI
 
-How much time would it take to write a CMakeLists.txt for this project? With `abcmake` it is just several lines:
+If set will use emojis in the output.
 
-First component:
+`ABCMAKE_EMOJI = 1`:
 
-```cmake
-cmake_minimum_required(VERSION 3.5)
-project(object_finder)
+![eon](docs/README/emoji_on.png)
 
-include(${CMAKE_CURRENT_LIST_DIR}/../../ab.cmake)
-add_component(object_finder)
-```
+`ABCMAKE_EMOJI = 0`:
 
-...second:
-
-```cmake
-cmake_minimum_required(VERSION 3.5)
-project(visioner_base)
-
-include(${CMAKE_CURRENT_LIST_DIR}/../../ab.cmake)
-add_component(visioner_base)
-target_link_component(visioner_base ${CMAKE_CURRENT_LIST_DIR}/../object_finder)
-```
-
-...and the main project:
-
-```cmake
-cmake_minimum_required(VERSION 3.15)
-project(visioner)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-
-# OpenCV
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-
-# Executable
-include(ab.cmake)
-add_main_component(VisionerFile SOURCE_DIR "src/VisionerFile")
-target_link_libraries(VisionerFile PRIVATE ${OpenCV_LIBS})
-
-add_main_component(VisionerWebcam SOURCE_DIR "src/VisionerWebcam")
-target_link_libraries(VisionerWebcam PRIVATE ${OpenCV_LIBS})
-```
-
-That's it! The project is ready to be built. The `abcmake` will take care of the rest. All the binaries will be installed along with the `build` directory.
+![eoff](docs/README/emoji_off.png)
