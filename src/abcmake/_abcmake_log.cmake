@@ -17,9 +17,14 @@ else()
     set(__ABCMAKE_NOTE      "[INFO]")
 endif()
 
+# Print a message with indentation
+# @param INDENTATION The indentation level. If < 0, the message is not printed
+# @param MESSAGE The message to print
 function(_abcmake_log INDENTATION MESSAGE)
-    string(REPEAT ${__ABCMAKE_INDENTATION} ${INDENTATION} indentation)
-    message(STATUS "${indentation}${MESSAGE}")
+    if(${INDENTATION} GREATER_EQUAL 0)
+        string(REPEAT ${__ABCMAKE_INDENTATION} ${INDENTATION} indentation)
+        message(STATUS "${indentation}${MESSAGE}")
+    endif()
 endfunction()
 
 function(_abcmake_log_ok INDENTATION MESSAGE)

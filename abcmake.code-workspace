@@ -55,7 +55,7 @@
                     "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
                         "ABCMAKE_PATH": "${workspaceFolder}/src",
-                        "ABCMAKE_EMOJI": "0"
+                        "ABCMAKE_EMOJI": "1"
                     }
                 },
                 "problemMatcher": []
@@ -80,6 +80,7 @@
                     "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
                         "ABCMAKE_PATH": "${workspaceFolder}/src",
+                        "ABCMAKE_EMOJI": "1"
                     }
                 },
                 "problemMatcher": []
