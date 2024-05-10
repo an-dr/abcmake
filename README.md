@@ -47,6 +47,7 @@ Default project structure
         - [register\_components](#register_components)
         - [target\_link\_components](#target_link_components)
     - [Configuration](#configuration)
+        - [ABCMAKE\_EMOJI](#abcmake_emoji)
 
 ## Quick Start
 
@@ -147,4 +148,14 @@ target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello
 
 The module can be configured by setting environment variables:
 
-- `ABCMAKE_EMOJI` - if set will use emojis in the output.
+### ABCMAKE_EMOJI
+
+If set will use emojis in the output.
+
+`ABCMAKE_EMOJI = 1`:
+
+![eon](docs/README/emoji_on.png)
+
+`ABCMAKE_EMOJI = 0`:
+
+![eoff](docs/README/emoji_off.png)
