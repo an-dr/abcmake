@@ -426,7 +426,6 @@ set(__ABCMAKE_COMPONENT_REGISTRY_SEPARATOR "::::")
 function(register_components PATH)
 
     foreach(path ${ARGV})
-        # _abcmake_log_header(1 "Register component")
         message(DEBUG "  📂 Path: ${path}")
         _abcmake_add_project(${path} PROJECT_ABCMAKE_VER)
         if(PROJECT_ABCMAKE_VER)
