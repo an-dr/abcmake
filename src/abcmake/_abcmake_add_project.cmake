@@ -6,7 +6,7 @@ function(_abcmake_add_subdirectory PATH)
 
     # ABCMAKE_ADDED_PROJECTS is an interface, it may break compatibility if changed!
     _abcmake_get_prop(${ABCMAKE_PROP_ADDED_PROJECTS} projects)
-    message(DEBUG "Added projects: ${projects}")
+    message(DEBUG "[_abcmake_add_subdirectory] Added projects: ${projects}")
     
     # Resolve relative path
     get_filename_component(PATH "${PATH}" ABSOLUTE)
@@ -17,7 +17,7 @@ function(_abcmake_add_subdirectory PATH)
         
         # Use the last directory name for a binary directory name 
         get_filename_component(last_dir "${PATH}" NAME)
-        add_subdirectory(${PATH} abc_${last_dir})
+        add_subdirectory(${PATH} abc_${last_dir} EXCLUDE_FROM_ALL)
     endif()
     
 endfunction()
@@ -33,7 +33,7 @@ function(_abcmake_add_project PATH OUT_ABCMAKE_VER)
         return()
     endif()
 
-    message(DEBUG "Adding project ${PATH}")
+    message(DEBUG "[_abcmake_add_project] Adding project ${PATH}")
     _abcmake_add_subdirectory(${PATH})
     
     _abcmake_get_prop_dir(${PATH} "VERSION" version)

@@ -14,6 +14,9 @@ class TestBuild(TestCMake):
     def test_many_folders(self):
         self.build_cmake("test_many_folders")
     
+    def test_many_folders_lib(self):
+        self.build_cmake("test_many_folders_lib")
+    
     def test_project_custom(self):
         self.build_cmake("test_project_custom")
     

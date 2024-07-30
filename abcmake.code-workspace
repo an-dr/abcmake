@@ -137,6 +137,7 @@
                     { "value": "test_default_project", },
                     { "value": "test_interdep" },
                     { "value": "test_many_folders" },
+                    { "value": "test_many_folders_lib" },
                     { "value": "test_project_custom" },
                     { "value": "test_register" },
                 ]

@@ -17,6 +17,8 @@ set(_ABCMAKE_PROP_INSTALL_DIR "INSTALL_DIR") # The directory where the project w
 set(ABCMAKE_DIRPROP_VERSION "VERSION") # The abcmake version of the component
 set(ABCMAKE_DIRPROP_COMPONENT_NAME "COMPONENT_NAME") # The name of the component (local PROJECT_NAME)
 set(ABCMAKE_DIRPROP_TARGETS "TARGETS") # The list of targets built by the component
+set(ABCMAKE_DIRPROP_SRC "COMPONENT_SRC") # The list of source directories
+set(ABCMAKE_DIRPROP_INCLUDE "COMPONENT_INCLUDE") # The list of include directories
 
 # Default values
 set(_ABCMAKE_DEFAULT_COMPONENTS_DIR "components")
@@ -30,23 +32,23 @@ set(_ABCMAKE_DEFAULT_INSTALL_DIR "${CMAKE_BINARY_DIR}/../install")
 
 function(_abcmake_set_prop PROPERTY_NAME PROPERTY_VALUE)
     set_property(GLOBAL PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 "${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME}" "${PROPERTY_VALUE}")
 endfunction()
 
 function(_abcmake_append_prop PROPERTY_NAME PROPERTY_VALUE)
     set_property(GLOBAL APPEND PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 "${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME}" "${PROPERTY_VALUE}")
 endfunction()
 
 function(_abcmake_set_prop_curdir PROPERTY_NAME PROPERTY_VALUE)
     set_directory_properties(PROPERTIES
-                             ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
+                             "${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME}" "${PROPERTY_VALUE}")
 endfunction()
 
 function(_abcmake_append_prop_curdir PROPERTY_NAME PROPERTY_VALUE)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
                  APPEND PROPERTY 
-                 ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} ${PROPERTY_VALUE})
+                 "${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME}" "${PROPERTY_VALUE}")
 endfunction()
 
 
@@ -78,6 +80,7 @@ function(_abcmake_get_prop PROPERTY_NAME OUT_VAR_NAME)
 endfunction()
 
 function(_abcmake_get_prop_dir DIRECTORY PROPERTY_NAME OUT_VAR_NAME)
+    message(DEBUG "[_abcmake_get_prop_dir] Getting property ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME} from ${DIRECTORY}")
     get_directory_property(tmp_result DIRECTORY ${DIRECTORY}
         ${ABCMAKE_PROPERTY_PREFIX}${PROPERTY_NAME})
     set(${OUT_VAR_NAME} ${tmp_result} PARENT_SCOPE)
