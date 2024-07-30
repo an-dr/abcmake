@@ -33,8 +33,8 @@ function (_abcmake_target_link_components PROCESS_LEVEL TARGETNAME)
     set(listArgs PATH NAME)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
     
-    message(DEBUG "_abcmake_target_link_components arg_PATH: ${arg_PATH}")
-    message(DEBUG "_abcmake_target_link_components arg_NAME: ${arg_NAME}")
+    message(DEBUG "[_abcmake_target_link_components] arg_PATH: ${arg_PATH}")
+    message(DEBUG "[_abcmake_target_link_components] arg_NAME: ${arg_NAME}")
     
     # Link components by path
     foreach(PATH ${arg_PATH})

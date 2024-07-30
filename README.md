@@ -1,6 +1,6 @@
 ﻿# abcmake - Simple CMake for Simple Projects
 
-![version](https://img.shields.io/badge/version-6.0.0-green)
+![version](https://img.shields.io/badge/version-6.1.0-green)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 `abcmake` or **Andrei's Build CMake subsystem** is a CMake module providing a set of functions focused on working with a project as a set of components - individually buildable units.
@@ -14,11 +14,13 @@ The module is designed to simplify the process of creating and linking component
 - [abcmake - Simple CMake for Simple Projects](#abcmake---simple-cmake-for-simple-projects)
     - [Table of Contents](#table-of-contents)
     - [Quick Start](#quick-start)
+    - [Requirements](#requirements)
     - [Public Functions](#public-functions)
         - [add\_main\_component](#add_main_component)
         - [add\_component](#add_component)
         - [register\_components](#register_components)
         - [target\_link\_components](#target_link_components)
+    - [Limitations](#limitations)
     - [Configuration](#configuration)
         - [ABCMAKE\_EMOJI](#abcmake_emoji)
 
@@ -71,6 +73,10 @@ If you want to use the module in your project, you can use the badge:
 ```markdown
 [![abcmake](https://img.shields.io/badge/uses-abcmake-blue)](https://github.com/an-dr/abcmake)
 ```
+
+## Requirements
+
+- CMake 3.5 or higher
 
 ## Public Functions
 
@@ -142,6 +148,10 @@ target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello
                                        NAME FirstComponent 
                                             SecondComponent)
 ```
+
+## Limitations
+
+- The module allows only one component per CMakelists.txt file.
 
 ## Configuration
 
