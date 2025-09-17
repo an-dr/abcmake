@@ -7,7 +7,9 @@
 
 The module is designed to simplify the process of creating and linking components in a project. The view on a source code as a set of component increases the code portability and reusability. The module works best with small and medium-sized projects.
 
-[![version](https://img.shields.io/badge/Download-ab.cmake-blue)](release/ab.cmake)
+Download the latest single-file module from the GitHub Releases page:
+
+[![GitHub Release](https://img.shields.io/github/v/release/an-dr/abcmake?label=latest%20release)](https://github.com/an-dr/abcmake/releases)
 
 ## Table of Contents
 
@@ -23,12 +25,13 @@ The module is designed to simplify the process of creating and linking component
     - [Limitations](#limitations)
     - [Configuration](#configuration)
         - [ABCMAKE\_EMOJI](#abcmake_emoji)
+    - [Release Generation](#release-generation)
 
 ## Quick Start
 
 The simplest way of using the module is to use the default project structure:
 
-```
+```text
 Default project structure
 -------------------------
 
@@ -186,3 +189,19 @@ If set will use emojis in the output.
 `ABCMAKE_EMOJI = 0`:
 
 ![eoff](docs/README/emoji_off.png)
+
+## Release Generation
+
+The single-file distribution is no longer stored in the repository. It is produced dynamically and attached to each GitHub Release as `ab.cmake`:
+
+1. Locally (or in CI) you can generate it with:
+
+   ```bash
+   python scripts/generate_release.py
+   ```
+
+2. On every push, the build tests ensure internal consistency; no committed artifact check is performed.
+
+3. Pushing a version tag matching `v*.*.*` triggers the release workflow which regenerates the file and publishes a GitHub Release with the asset `ab.cmake`.
+
+Download: [GitHub Releases](https://github.com/an-dr/abcmake/releases) (pick the latest and grab `ab.cmake`).

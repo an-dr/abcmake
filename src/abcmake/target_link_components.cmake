@@ -1,45 +1,59 @@
 # ==============================================================================
 # target_link_components.cmake =================================================
 
-# Link a component to the target
-#
-# @param TARGETNAME - name of the target for linking
-# @param COMPONENTPATH - path to the component to link
-function (_abcmake_target_link_single_component PROCESS_LEVEL TARGETNAME COMPONENTPATH)
-
+# Link internal abcmake component if present.
+# Returns TRUE in OUT_LINKED if a link action happened.
+function(_abcmake_try_link_abcmake_component PROCESS_LEVEL TARGETNAME COMPONENTPATH OUT_LINKED)
+    set(${OUT_LINKED} FALSE PARENT_SCOPE)
     _abcmake_add_project(${COMPONENTPATH} ver)
     if (ver)
-        # What to link?
         _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
-        
-        # Link
-        target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
-        _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked ${to_link}")
-    else()
-        # Not an abcmake project. Try to detect a CMake package (folder with *Config.cmake)
-        if (EXISTS ${COMPONENTPATH})
-            file(GLOB _abc_pkg_configs "${COMPONENTPATH}/*Config.cmake")
-            if (_abc_pkg_configs)
-                foreach(_abc_pkg_cfg ${_abc_pkg_configs})
-                    # Derive package name: <name>Config.cmake -> <name>
-                    get_filename_component(_abc_pkg_cfg_name "${_abc_pkg_cfg}" NAME_WE)
-                    string(REGEX REPLACE "Config$" "" _abc_pkg_name "${_abc_pkg_cfg_name}")
-                    if (NOT _abc_pkg_name)
-                        continue()
-                    endif()
-                    # Use CONFIG mode and restrict search path to the component directory
-                    find_package(${_abc_pkg_name} CONFIG PATHS "${COMPONENTPATH}" NO_DEFAULT_PATH QUIET)
-                    if (TARGET ${_abc_pkg_name}::${_abc_pkg_name})
-                        target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name}::${_abc_pkg_name})
-                        _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package ${_abc_pkg_name}::${_abc_pkg_name}")
-                    elseif (TARGET ${_abc_pkg_name})
-                        target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name})
-                        _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package target ${_abc_pkg_name}")
-                    else()
-                        _abcmake_log_warn(${PROCESS_LEVEL} "Detected package config for ${_abc_pkg_name} but no target ${_abc_pkg_name} or ${_abc_pkg_name}::${_abc_pkg_name} was created")
-                    endif()
-                endforeach()
+        if (to_link)
+            target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
+            _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked ${to_link}")
+            set(${OUT_LINKED} TRUE PARENT_SCOPE)
+        endif()
+    endif()
+endfunction()
+
+# Attempt to detect and link CMake package(s) located in COMPONENTPATH.
+# A package is detected by presence of *Config.cmake files.
+# Returns TRUE in OUT_LINKED if any package targets were linked.
+function(_abcmake_try_link_cmake_package PROCESS_LEVEL TARGETNAME COMPONENTPATH OUT_LINKED)
+    set(linked FALSE)
+    if (EXISTS ${COMPONENTPATH})
+        file(GLOB _abc_pkg_configs "${COMPONENTPATH}/*Config.cmake")
+        foreach(_abc_pkg_cfg ${_abc_pkg_configs})
+            get_filename_component(_abc_pkg_cfg_name "${_abc_pkg_cfg}" NAME_WE)
+            string(REGEX REPLACE "Config$" "" _abc_pkg_name "${_abc_pkg_cfg_name}")
+            if (NOT _abc_pkg_name)
+                continue()
             endif()
+            find_package(${_abc_pkg_name} CONFIG PATHS "${COMPONENTPATH}" NO_DEFAULT_PATH QUIET)
+            if (TARGET ${_abc_pkg_name}::${_abc_pkg_name})
+                target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name}::${_abc_pkg_name})
+                _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package ${_abc_pkg_name}::${_abc_pkg_name}")
+                set(linked TRUE)
+            elseif (TARGET ${_abc_pkg_name})
+                target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name})
+                _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package target ${_abc_pkg_name}")
+                set(linked TRUE)
+            else()
+                _abcmake_log_warn(${PROCESS_LEVEL} "Detected package config for ${_abc_pkg_name} but no target ${_abc_pkg_name} or ${_abc_pkg_name}::${_abc_pkg_name} was created")
+            endif()
+        endforeach()
+    endif()
+    set(${OUT_LINKED} ${linked} PARENT_SCOPE)
+endfunction()
+
+# High-level helper to link a component (abcmake or package).
+function (_abcmake_target_link_single_component PROCESS_LEVEL TARGETNAME COMPONENTPATH)
+    _abcmake_try_link_abcmake_component(${PROCESS_LEVEL} ${TARGETNAME} ${COMPONENTPATH} linked_component)
+    if (NOT linked_component)
+        _abcmake_try_link_cmake_package(${PROCESS_LEVEL} ${TARGETNAME} ${COMPONENTPATH} linked_pkg)
+        if (NOT linked_pkg)
+            # Nothing linked: silent; original behavior simply warned for abcmake absence.
+            # Keep a gentle note at higher verbosity if desired later.
         endif()
     endif()
 endfunction()

@@ -1,0 +1,47 @@
+name: Generate Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.x'
+
+      - name: Generate release artifact
+        run: |
+          python scripts/generate_release.py --check || python scripts/generate_release.py
+          echo "Generated release/ab.cmake"
+
+      - name: Capture version
+        id: version
+        run: |
+          TAG_REF="${GITHUB_REF##*/}"
+          echo "tag=$TAG_REF" >> $GITHUB_OUTPUT
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: abcmake-${{ steps.version.outputs.tag }}
+          path: release/ab.cmake
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: abcmake ${{ steps.version.outputs.tag }}
+          body: |
+            Automated release for ${{ steps.version.outputs.tag }}.
+            The single-file module is attached as an asset.
+          files: |
+            release/ab.cmake
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
