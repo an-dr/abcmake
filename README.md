@@ -149,6 +149,24 @@ target_link_components(${PROJECT_NAME} PATH ${CMAKE_CURRENT_LIST_DIR}/libs/hello
                                             SecondComponent)
 ```
 
+#### Automatic CMake Package Detection
+
+When traversing the `components` directory, if a subdirectory is not an `abcmake` component (no `ab.cmake` usage / metadata) but contains one or more `*Config.cmake` files, `abcmake` will attempt to treat it as a CMake package. Each `*Config.cmake` filename is parsed to derive the package name and `find_package(<name> CONFIG PATHS <dir> NO_DEFAULT_PATH QUIET)` is executed. If targets `<name>` or `<name>::<name>` are provided by the package, they are automatically linked to the parent target.
+
+This makes it possible to drop a pre-configured package (for example, a vendored library with its generated `Config.cmake` + `Targets.cmake` files) directly into the `components` folder without modifying your `CMakeLists.txt`.
+
+Example layout:
+
+```text
+components/
+    myexec/
+    microlog/            # contains micrologConfig.cmake / micrologTargets.cmake
+    lib_exclamation/     # traditional CMake project (not abcmake) - link manually
+```
+
+`microlog` will be auto-detected and linked. A plain CMake project (like `lib_exclamation` with only a `CMakeLists.txt`) is added to the build tree but still must be linked manually (e.g. via `target_link_libraries`).
+
+
 ## Limitations
 
 - The module allows only one component per CMakelists.txt file.

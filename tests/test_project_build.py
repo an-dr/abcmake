@@ -29,6 +29,11 @@ class TestBuild(TestCMake):
         self.assertTrue(os.path.exists("test_compile_commands/build/compile_commands.json"),
                         "compile_commands.json does not exist")
 
+    def test_cmake_package(self):
+        # Build project that contains a raw CMake package (microlog) inside components
+        # and a non-abcmake CMake library (lib_exclamation). Ensures package auto-detection works.
+        self.build_cmake("test_cmake_package")
+
 
 if __name__ == '__main__':
     unittest.main()
