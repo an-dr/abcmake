@@ -133,6 +133,7 @@
                 "description": "Select test",
                 "default": "test_default_project",
                 "options": [
+                    { "value": "test_cmake_package" },
                     { "value": "test_compile_commands" },
                     { "value": "test_default_project", },
                     { "value": "test_interdep" },

@@ -7,9 +7,9 @@
 # e-mail:  mail@agramakov.me
 #
 # *************************************************************************
-from asyncio import sleep
 import os
 import re
+import sys
 
 ABC_DIR_PATH = "src"
 
@@ -34,13 +34,14 @@ def get_list_with_str_containing(data, substr):
     return [line for line in data if substr in line]        
 
 def get_replacement_dict(includes:list):
+    # Deterministic order
     replace_dict = {}
-    for line in includes:
-        # include({CMAKE_CURRENT_SOURCE_DIR}/...) -> ...
-        search = re.search('include\((.+)\)', line)
-        if search:
-            found = search.group(1)
-        file_path = found.replace("${CMAKE_CURRENT_LIST_DIR}", ABC_DIR_PATH)
+    for line in sorted(includes):
+        search = re.search(r'include\((.+)\)', line)
+        if not search:
+            continue
+        file_path_expr = search.group(1)
+        file_path = file_path_expr.replace("${CMAKE_CURRENT_LIST_DIR}", ABC_DIR_PATH)
         new_data = read_file(file_path)
         replace_dict[line] = new_data
     return replace_dict
@@ -50,18 +51,35 @@ def write_file(path, data):
     with open(path, "w", encoding='utf-8') as f:
         f.write(data)
 
-if __name__ == '__main__':
-    set_cwd_to_repo()
-    
+def build_release_content():
     main_file = get_main_file()
     includes = get_lines_starting_with_include(main_file)
     includes = get_list_with_str_containing(includes, "CMAKE_CURRENT_LIST_DIR")
-    
     replace_dict = get_replacement_dict(includes)
-
     for old, new in replace_dict.items():
-        main_file = main_file.replace(old,new)
-    
-    write_file("release/ab.cmake", main_file)
-    
-    print("✅ new release generated!")
+        main_file = main_file.replace(old, new)
+    return main_file
+
+def main():
+    set_cwd_to_repo()
+    new_content = build_release_content()
+    release_path = "release/ab.cmake"
+    old_content = None
+    if os.path.exists(release_path):
+        old_content = read_file(release_path)
+
+    if "--check" in sys.argv:
+        if old_content is None:
+            print("release/ab.cmake is missing (check failed)")
+            sys.exit(1)
+        if old_content != new_content:
+            print("release/ab.cmake is out of date. Run: python scripts/generate_release.py")
+            sys.exit(2)
+        print("release/ab.cmake is up to date.")
+        return
+
+    write_file(release_path, new_content)
+    print("✅ release/ab.cmake generated ({} bytes)".format(len(new_content)))
+
+if __name__ == '__main__':
+    main()
