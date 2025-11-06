@@ -4,6 +4,7 @@ import os
 import shutil
 from pathlib import Path
 
+
 class TestFindPackage(unittest.TestCase):
     """Test that abcmake can be installed and found via find_package()"""
 
@@ -30,28 +31,37 @@ class TestFindPackage(unittest.TestCase):
             ["cmake", "-B", str(self.build_dir), "-G", "Ninja"],
             cwd=self.root_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
-        self.assertEqual(result.returncode, 0,
-                        f"CMake configure failed:\n{result.stderr}")
-        self.assertIn("abcmake version", result.stderr)
+        self.assertEqual(
+            result.returncode, 0, f"CMake configure failed:\n{result.stderr}"
+        )
+        self.assertIn("abcmake version", result.stdout)
 
         # Step 2: Install to test location
         print("=== Installing abcmake ===")
         result = subprocess.run(
-            ["cmake", "--install", str(self.build_dir),
-             "--prefix", str(self.test_install_dir)],
+            [
+                "cmake",
+                "--install",
+                str(self.build_dir),
+                "--prefix",
+                str(self.test_install_dir),
+            ],
             cwd=self.root_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
-        self.assertEqual(result.returncode, 0,
-                        f"CMake install failed:\n{result.stderr}")
+        self.assertEqual(
+            result.returncode, 0, f"CMake install failed:\n{result.stderr}"
+        )
 
         # Verify installation files exist
         install_cmake_dir = self.test_install_dir / "share" / "cmake" / "abcmake"
-        self.assertTrue(install_cmake_dir.exists(),
-                       f"Install directory not created: {install_cmake_dir}")
+        self.assertTrue(
+            install_cmake_dir.exists(),
+            f"Install directory not created: {install_cmake_dir}",
+        )
 
         required_files = [
             "ab.cmake",
@@ -68,8 +78,9 @@ class TestFindPackage(unittest.TestCase):
 
         for file_path in required_files:
             full_path = install_cmake_dir / file_path
-            self.assertTrue(full_path.exists(),
-                          f"Required file not installed: {file_path}")
+            self.assertTrue(
+                full_path.exists(), f"Required file not installed: {file_path}"
+            )
 
         # Step 3: Test find_package
         print("=== Testing find_package ===")
@@ -78,14 +89,15 @@ class TestFindPackage(unittest.TestCase):
             ["cmake", "-P", str(test_script)],
             cwd=self.root_dir / "tests",
             capture_output=True,
-            text=True
+            text=True,
         )
 
-        self.assertEqual(result.returncode, 0,
-                        f"find_package test failed:\n{result.stderr}")
-        self.assertIn("SUCCESS! abcmake package was found!", result.stderr)
-        self.assertIn("Found abcmake: 6.2.0", result.stderr)
-        self.assertIn("✓ ab.cmake found", result.stderr)
+        self.assertEqual(
+            result.returncode, 0, f"find_package test failed:\n{result.stderr}"
+        )
+        self.assertIn("SUCCESS! abcmake package was found!", result.stdout)
+        self.assertIn("abcmake version: 6.2.0", result.stdout)
+        self.assertIn("ab.cmake found at:", result.stdout)
 
     def test_find_package_with_custom_prefix(self):
         """Test that find_package works with CMAKE_PREFIX_PATH"""
@@ -95,31 +107,42 @@ class TestFindPackage(unittest.TestCase):
             ["cmake", "-B", str(self.build_dir), "-G", "Ninja"],
             cwd=self.root_dir,
             check=True,
-            capture_output=True
+            capture_output=True,
         )
         subprocess.run(
-            ["cmake", "--install", str(self.build_dir),
-             "--prefix", str(self.test_install_dir)],
+            [
+                "cmake",
+                "--install",
+                str(self.build_dir),
+                "--prefix",
+                str(self.test_install_dir),
+            ],
             cwd=self.root_dir,
             check=True,
-            capture_output=True
+            capture_output=True,
         )
 
         # Test with explicit INSTALL_PREFIX
         test_script = self.root_dir / "tests" / "test_find_package.cmake"
         result = subprocess.run(
-            ["cmake",
-             f"-DINSTALL_PREFIX={self.test_install_dir}",
-             "-P", str(test_script)],
+            [
+                "cmake",
+                f"-DINSTALL_PREFIX={self.test_install_dir}",
+                "-P",
+                str(test_script),
+            ],
             cwd=self.root_dir / "tests",
             capture_output=True,
-            text=True
+            text=True,
         )
 
-        self.assertEqual(result.returncode, 0,
-                        f"find_package with custom prefix failed:\n{result.stderr}")
-        self.assertIn("SUCCESS!", result.stderr)
+        self.assertEqual(
+            result.returncode,
+            0,
+            f"find_package with custom prefix failed:\n{result.stderr}",
+        )
+        self.assertIn("SUCCESS!", result.stdout)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
