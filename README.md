@@ -52,7 +52,7 @@ cmake --install build --prefix /usr/local  # or your preferred prefix
 Then in your project's `CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(YourProject)
 
 find_package(abcmake REQUIRED)

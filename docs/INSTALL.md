@@ -62,7 +62,7 @@ After installation, use abcmake in your projects like this:
 ### CMakeLists.txt
 
 ```cmake
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(MyProject)
 
 # Find the installed abcmake package
@@ -97,7 +97,7 @@ my_project/
 Components can also use the installed abcmake:
 
 ```cmake
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(mylib)
 
 # If abcmake was found by the parent, it's already available

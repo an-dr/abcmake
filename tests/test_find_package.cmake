@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 
 # This test verifies that find_package(abcmake) works correctly
 # Usage:
