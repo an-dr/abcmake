@@ -1,5 +1,7 @@
 build
 install
 release
+test_install
 .vscode
 *.pyc
+.claude

@@ -35,11 +35,40 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 
 ## Installation
 
+### Method 1: System-wide Installation (Recommended)
+
+Install abcmake system-wide so you can use `find_package()` in any project:
+
+```bash
+# Clone the repository
+git clone https://github.com/an-dr/abcmake.git
+cd abcmake
+
+# Configure and install
+cmake -B build
+cmake --install build --prefix /usr/local  # or your preferred prefix
+```
+
+Then in your project's `CMakeLists.txt`:
+
+```cmake
+cmake_minimum_required(VERSION 3.5)
+project(YourProject)
+
+find_package(abcmake REQUIRED)
+# abcmake functions are now available
+add_main_component(${PROJECT_NAME})
+```
+
+### Method 2: Single-file Download
+
 1. Download `ab.cmake` from the latest [GitHub Release](https://github.com/an-dr/abcmake/releases).
 2. Place it at your project root next to `CMakeLists.txt`.
 3. `include(ab.cmake)` in your root `CMakeLists.txt`.
 
-Optional (submodules / vendored): you can also keep the whole repository and include via `set(ABCMAKE_PATH path/to/src)` & `include(${ABCMAKE_PATH}/ab.cmake)`.
+### Method 3: Submodule / Vendored
+
+You can also keep the whole repository and include via `set(ABCMAKE_PATH path/to/src)` & `include(${ABCMAKE_PATH}/ab.cmake)`.
 
 ## Quick Start
 
