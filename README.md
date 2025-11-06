@@ -46,7 +46,7 @@ Optional (submodules / vendored): you can also keep the whole repository and inc
 Minimal root `CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(HelloWorld)
 include(ab.cmake)
 add_main_component(${PROJECT_NAME})
@@ -71,7 +71,7 @@ project/
 Add a component (`components/mylib/CMakeLists.txt`):
 
 ```cmake
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(mylib)
 include($ENV{ABCMAKE_PATH}/ab.cmake) # or relative path if local copy
 add_component(${PROJECT_NAME})
