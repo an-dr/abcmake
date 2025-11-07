@@ -8,10 +8,11 @@ cmake_minimum_required(VERSION 3.15)
 
 # Determine the test installation path
 if(NOT DEFINED INSTALL_PREFIX)
-    # Default: use test_install directory in project root
-    get_filename_component(PROJECT_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-    set(INSTALL_PREFIX "${PROJECT_ROOT}/test_install")
+    # Default: use the install directory created by the Python test
+    set(INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/install")
 endif()
+
+get_filename_component(INSTALL_PREFIX "${INSTALL_PREFIX}" ABSOLUTE)
 
 message(STATUS "Testing find_package with install prefix: ${INSTALL_PREFIX}")
 
