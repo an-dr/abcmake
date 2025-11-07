@@ -1,6 +1,5 @@
 import subprocess
 import unittest
-import os
 import shutil
 from pathlib import Path
 
@@ -12,8 +11,8 @@ class TestFindPackage(unittest.TestCase):
     def setUpClass(cls):
         """Set up test installation directory"""
         cls.root_dir = Path(__file__).parent.parent
-        cls.test_install_dir = cls.root_dir / "test_install"
-        cls.build_dir = cls.root_dir / "build"
+        cls.test_install_dir = Path(__file__).parent / "test_find_package" / "install"
+        cls.build_dir = Path(__file__).parent / "test_find_package"  / "build"
 
     def setUp(self):
         """Clean up before each test"""
@@ -32,6 +31,7 @@ class TestFindPackage(unittest.TestCase):
             cwd=self.root_dir,
             capture_output=True,
             text=True,
+            check=False,
         )
         self.assertEqual(
             result.returncode, 0, f"CMake configure failed:\n{result.stderr}"
@@ -51,6 +51,7 @@ class TestFindPackage(unittest.TestCase):
             cwd=self.root_dir,
             capture_output=True,
             text=True,
+            check=False,
         )
         self.assertEqual(
             result.returncode, 0, f"CMake install failed:\n{result.stderr}"
@@ -84,12 +85,13 @@ class TestFindPackage(unittest.TestCase):
 
         # Step 3: Test find_package
         print("=== Testing find_package ===")
-        test_script = self.root_dir / "tests" / "test_find_package.cmake"
+        test_script = self.root_dir / "tests" / "test_find_package" / "test_find_package.cmake"
         result = subprocess.run(
             ["cmake", "-P", str(test_script)],
             cwd=self.root_dir / "tests",
             capture_output=True,
             text=True,
+            check=False,
         )
 
         self.assertEqual(
@@ -123,7 +125,7 @@ class TestFindPackage(unittest.TestCase):
         )
 
         # Test with explicit INSTALL_PREFIX
-        test_script = self.root_dir / "tests" / "test_find_package.cmake"
+        test_script = self.root_dir / "tests" / "test_find_package" / "test_find_package.cmake"
         result = subprocess.run(
             [
                 "cmake",
@@ -134,6 +136,7 @@ class TestFindPackage(unittest.TestCase):
             cwd=self.root_dir / "tests",
             capture_output=True,
             text=True,
+            check=False,
         )
 
         self.assertEqual(
