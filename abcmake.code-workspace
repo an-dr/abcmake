@@ -23,7 +23,7 @@
         "tasks": [
             // run scripts\generate_release.py
             {
-                "label": "generate_release",
+                "label": "Generate Single Release File",
                 "type": "shell",
                 "command": "python",
                 "args": [
@@ -36,8 +36,47 @@
                 "problemMatcher": []
                 
             },
+            // Cmake configure
             {
                 "label": "Configure",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S ."
+                ],
+                "problemMatcher": []
+            },
+            // Cmake build
+            {
+                "label": "Build",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "build",
+                    "--target",
+                    "all",
+                    "--config",
+                    "Release"
+                ],
+                "problemMatcher": [],
+            },
+            {
+                "label": "Install",
+                "type": "shell",
+                "command": "sudo",
+                "args": [
+                    "cmake",
+                    "--install",
+                    "build",
+                ],
+            },
+            {
+                "label": "Test: Configure",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -61,7 +100,7 @@
                 "problemMatcher": []
             },
             {
-                "label": "Configure (DEBUG)",
+                "label": "Test: Configure (DEBUG)",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -87,7 +126,7 @@
             },
             // Cmake build
             {
-                "label": "Build",
+                "label": "Test: Build",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -109,7 +148,7 @@
             },
             // Install to workspace/install
             {
-                "label": "Install",
+                "label": "Test: Install",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
