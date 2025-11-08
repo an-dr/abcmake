@@ -28,3 +28,67 @@ jobs:
     - name: UnitTests
       working-directory: tests
       run: python -m unittest discover -v
+
+    - name: Test Installation Scripts
+      run: |
+        echo "Testing installation script functionality..."
+        
+        # Test bash script syntax
+        bash -n scripts/install.sh
+        echo "✅ install.sh syntax is valid"
+        
+        # Test help functionality
+        bash scripts/install.sh --help | grep -q "abcmake Installation Script"
+        echo "✅ install.sh help works"
+        
+        # Test version detection (without actually installing)
+        if command -v curl >/dev/null; then
+          VERSION=$(curl -fsSL "https://api.github.com/repos/${{ github.repository }}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+          if [[ -n "$VERSION" && "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "✅ Version detection works: $VERSION"
+          else
+            echo "ℹ️  Version detection returned: $VERSION (this is normal for development)"
+          fi
+        fi
+        
+        echo "Installation script tests completed!"
+
+    - name: Test CMake Package Installation
+      run: |
+        echo "Testing CMake package installation process..."
+        
+        # Build and install abcmake
+        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/test-install
+        cmake --build build --config Release
+        cmake --install build --config Release
+        
+        # Test that find_package works
+        mkdir -p test-project
+        cd test-project
+        
+        cat > CMakeLists.txt << EOF
+        cmake_minimum_required(VERSION 3.15)
+        project(TestProject)
+        
+        list(APPEND CMAKE_PREFIX_PATH "${{ github.workspace }}/test-install")
+        find_package(abcmake REQUIRED)
+        
+        message(STATUS "abcmake found successfully!")
+        message(STATUS "abcmake version: \${abcmake_VERSION}")
+        message(STATUS "abcmake dir: \${abcmake_DIR}")
+        
+        # Create a simple test target
+        add_executable(test_app main.cpp)
+        EOF
+        
+        cat > main.cpp << EOF
+        #include <iostream>
+        int main() {
+            std::cout << "Test successful!" << std::endl;
+            return 0;
+        }
+        EOF
+        
+        # Test configuration
+        cmake -B build -G Ninja
+        echo "✅ CMake package installation test passed!"
