@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Cross-platform installation scripts (`install.sh` for Unix/Linux/macOS, `install.ps1` for Windows)
+- One-command installation: `curl -fsSL https://raw.githubusercontent.com/an-dr/abcmake/main/scripts/install.sh | bash`
+- SHA256 checksums for all release artifacts
+- Enhanced release workflow with installation scripts and checksums
+- Package manager specifications for future distribution (Homebrew, Chocolatey)
+- Comprehensive installation documentation with multiple methods
+
+### Changed
+
+- README installation section restructured with quick installation as primary method
+- Release artifacts now include installation scripts and checksums
+- Enhanced GitHub release descriptions with installation instructions
+
 ## [6.2.0] - 2025-09-17
 
 ### Added

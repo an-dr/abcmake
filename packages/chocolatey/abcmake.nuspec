@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>abcmake</id>
+    <version>6.2.0</version>
+    <packageSourceUrl>https://github.com/an-dr/abcmake/tree/main/packages/chocolatey</packageSourceUrl>
+    <owners>an-dr</owners>
+    <title>abcmake</title>
+    <authors>Andrei Gramakov</authors>
+    <projectUrl>https://github.com/an-dr/abcmake</projectUrl>
+    <iconUrl>https://github.com/an-dr/abcmake/raw/main/docs/logo.png</iconUrl>
+    <copyright>2024 Andrei Gramakov</copyright>
+    <licenseUrl>https://github.com/an-dr/abcmake/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/an-dr/abcmake</projectSourceUrl>
+    <docsUrl>https://github.com/an-dr/abcmake/blob/main/README.md</docsUrl>
+    <bugTrackerUrl>https://github.com/an-dr/abcmake/issues</bugTrackerUrl>
+    <tags>cmake build-system cpp c development</tags>
+    <summary>CMake module for C/C++ projects with predefined standard structure</summary>
+    <description>
+abcmake is a CMake module that simplifies building C/C++ projects with a predefined standard structure. It provides automatic component discovery, linking, and installation features.
+
+## Features
+
+- Automatic discovery and building of components in a structured project
+- Registry for linking components by name rather than path
+- Auto-detection of vendored CMake packages
+- Generates compile_commands.json
+- Install step for each built target
+- Single-file distributable
+
+## Usage
+
+Add to your CMakeLists.txt:
+
+```cmake
+find_package(abcmake REQUIRED)
+add_main_component(${PROJECT_NAME})
+```
+
+## Project Structure
+
+```
+project/
+├── CMakeLists.txt
+├── src/
+│   └── main.cpp
+├── include/
+│   └── project/
+└── components/
+    └── mylib/
+        ├── CMakeLists.txt
+        ├── src/
+        └── include/
+```
+    </description>
+    <releaseNotes>https://github.com/an-dr/abcmake/blob/main/CHANGELOG.md</releaseNotes>
+    <dependencies>
+      <dependency id="cmake" version="3.15.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="chocolateyinstall.ps1" target="tools" />
+  </files>
+</package>

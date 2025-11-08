@@ -35,7 +35,25 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 
 ## Installation
 
-### Method 1: System-wide Installation (Recommended)
+### Quick Installation (Recommended)
+
+**Unix/Linux/macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/an-dr/abcmake/main/scripts/install.sh | bash
+```
+
+**Windows PowerShell:**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/an-dr/abcmake/main/scripts/install.ps1 | iex
+```
+
+The installation scripts will automatically download and install the latest release. Use `--user` (Unix) or `-User` (Windows) for user-only installation that doesn't require administrator privileges.
+
+### Alternative Installation Methods
+
+#### Method 1: System-wide Installation (Manual)
 
 Install abcmake system-wide so you can use `find_package()` in any project:
 
@@ -60,13 +78,13 @@ find_package(abcmake REQUIRED)
 add_main_component(${PROJECT_NAME})
 ```
 
-### Method 2: Single-file Download
+#### Method 2: Single-file Download
 
 1. Download `ab.cmake` from the latest [GitHub Release](https://github.com/an-dr/abcmake/releases).
 2. Place it at your project root next to `CMakeLists.txt`.
 3. `include(ab.cmake)` in your root `CMakeLists.txt`.
 
-### Method 3: Submodule / Vendored
+#### Method 3: Submodule / Vendored
 
 You can also keep the whole repository and include via `set(ABCMAKE_PATH path/to/src)` & `include(${ABCMAKE_PATH}/ab.cmake)`.
 

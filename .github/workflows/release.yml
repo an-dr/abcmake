@@ -5,12 +5,27 @@ on:
     tags:
       - 'v*.*.*'
 
+env:
+  BUILD_TYPE: Release
+
 jobs:
   build-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure CMake
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+
+      - name: Build Package
+        run: cmake --build build --config $BUILD_TYPE
+
+      - name: Install Package
+        run: cmake --install build --config $BUILD_TYPE --prefix ${{ github.workspace }}/install
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,11 +43,39 @@ jobs:
           TAG_REF="${GITHUB_REF##*/}"
           echo "tag=$TAG_REF" >> $GITHUB_OUTPUT
 
+      - name: Archive installed package
+        run: |
+          tar -czf abcmake-${{ steps.version.outputs.tag }}-install.tar.gz -C install .
+
+      - name: Generate checksums
+        run: |
+          sha256sum release/ab.cmake > release/ab.cmake.sha256
+          sha256sum abcmake-${{ steps.version.outputs.tag }}-install.tar.gz > abcmake-${{ steps.version.outputs.tag }}-install.tar.gz.sha256
+          echo "Generated checksums"
+
+      - name: Copy installation scripts
+        run: |
+          cp scripts/install.sh release/
+          cp scripts/install.ps1 release/
+          chmod +x release/install.sh
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: abcmake-${{ steps.version.outputs.tag }}
-          path: release/ab.cmake
+          path: |
+            release/ab.cmake
+            release/ab.cmake.sha256
+            release/install.sh
+            release/install.ps1
+
+      - name: Upload package archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: abcmake-${{ steps.version.outputs.tag }}-install
+          path: |
+            abcmake-${{ steps.version.outputs.tag }}-install.tar.gz
+            abcmake-${{ steps.version.outputs.tag }}-install.tar.gz.sha256
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -40,8 +83,38 @@ jobs:
           name: abcmake ${{ steps.version.outputs.tag }}
           body: |
             Automated release for ${{ steps.version.outputs.tag }}.
-            The single-file module is attached as an asset.
+            
+            ## Quick Installation
+            
+            **Unix/Linux/macOS:**
+            ```bash
+            curl -fsSL https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/install.sh | bash
+            ```
+            
+            **Windows PowerShell:**
+            ```powershell
+            iwr -useb https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/install.ps1 | iex
+            ```
+            
+            ## Manual Installation
+            
+            1. Download the installation package: `abcmake-${{ steps.version.outputs.tag }}-install.tar.gz`
+            2. Extract it to your desired location
+            3. Use `find_package(abcmake REQUIRED)` in your CMakeLists.txt
+            
+            ## Single File Usage
+            
+            Download `ab.cmake` and include it directly in your project.
+            
+            ## Checksums
+            
+            All files include SHA256 checksums for verification.
           files: |
             release/ab.cmake
+            release/ab.cmake.sha256
+            release/install.sh
+            release/install.ps1
+            abcmake-${{ steps.version.outputs.tag }}-install.tar.gz
+            abcmake-${{ steps.version.outputs.tag }}-install.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
