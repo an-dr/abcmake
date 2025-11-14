@@ -6,8 +6,6 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-from generate_version import DEFAULT_VERSION_FILE, load_semver, render_version_cmake
-
 ABC_SRC_DIR = "src"
 MAIN_FILE = "ab.cmake"
 RELEASE_PATH = "release/ab.cmake"
@@ -19,7 +17,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--src-dir", type=Path, default=Path(ABC_SRC_DIR))
     parser.add_argument("--main-file", type=str, default=MAIN_FILE)
     parser.add_argument("--output", type=Path, default=Path(RELEASE_PATH))
-    parser.add_argument("--version-file", type=Path, default=DEFAULT_VERSION_FILE)
     return parser.parse_args()
 
 
@@ -106,21 +103,9 @@ def build_replacement_dict(
             replacements[result[0]] = result[1]
     return replacements
 
-
-def apply_version_block(content: str, version_file: Path) -> str:
-    major, minor, patch = load_semver(version_file)
-    block = render_version_cmake(major, minor, patch).strip()
-    pattern = r"#\s*%VERSION%\s*(?:\r?\n)?"
-    replaced, count = re.subn(pattern, block + "\n\n", content, count=1)
-    if count:
-        return replaced
-    return content.replace("%VERSION%", block)
-
-
-def build_release_content(src_dir: Path, main_file: str, version_file: Path) -> str:
+def build_release_content(src_dir: Path, main_file: str) -> str:
     main_path = src_dir / main_file
     content = read_file(main_path)
-    content = apply_version_block(content, version_file)
     replacements = build_replacement_dict(content, src_dir)
     for match, replacement in replacements.items():
         content = content.replace(match, replacement)
@@ -144,7 +129,7 @@ def main() -> int:
     switch_to_repo_root()
 
     try:
-        content = build_release_content(args.src_dir, args.main_file, args.version_file)
+        content = build_release_content(args.src_dir, args.main_file)
         if args.check:
             return check_release(args.output, content)
         write_file(args.output, content)

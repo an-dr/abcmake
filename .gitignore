@@ -2,4 +2,5 @@ build
 install
 release
 .vscode
+.claude
 *.pyc

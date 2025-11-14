@@ -16,6 +16,7 @@
 # *************************************************************************
 
 # %VERSION% 
+include(${CMAKE_CURRENT_LIST_DIR}/version.cmake)
 
 # Configure CMake
 set(ABCMAKE ON)
