@@ -21,42 +21,28 @@
     "tasks": {
         "version": "2.0.0",
         "tasks": [
-            // run scripts\generate_release.py
             {
-                "label": "generate_release",
+                "label": "Test: run pytest suite",
                 "type": "shell",
                 "command": "python",
                 "args": [
-                    "scripts/generate_release.py"
+                    "-m",
+                    "pytest",
+                    "tests"
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
+                "group": "test",
                 "problemMatcher": []
-                
             },
             {
-                "label": "Configure",
+                "label": "Example: build hello_with_find_package",
                 "type": "shell",
-                "command": "cmake",
+                "command": "pwsh",
                 "args": [
-                    "-G",
-                    "Ninja",
-                    "-B",
-                    "build",
-                    "-S ."
+                    "-File",
+                    "build.ps1"
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/${input:test}",
-                    "env": {
-                        "ABCMAKE_PATH": "${workspaceFolder}/src",
-                        "ABCMAKE_EMOJI": "1"
-                    }
+                    "cwd": "${workspaceFolder}/examples/hello_with_find_package"
                 },
                 "problemMatcher": []
             },
@@ -85,9 +71,8 @@
                 },
                 "problemMatcher": []
             },
-            // Cmake build
             {
-                "label": "Build",
+                "label": "Build package",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -105,25 +90,31 @@
                 "options": {
                     "cwd": "${workspaceFolder}/tests/${input:test}"
                 },
-                "problemMatcher": [],
+                "problemMatcher": []
             },
-            // Install to workspace/install
             {
-                "label": "Install",
+                "label": "Install package",
                 "type": "shell",
-                "command": "cmake",
+                "command": "pwsh",
                 "args": [
-                    "--install",
-                    "build",
+                    "-File",
+                    "scripts/build_package.ps1"
                 ],
                 "group": {
                     "kind": "build",
                     "isDefault": true
                 },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/${input:test}",
-                },
-                "problemMatcher": [],
+                "problemMatcher": []
+            },
+            {
+                "label": "Generate single-file release",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "scripts/generate_release.py"
+                ],
+                "group": "build",
+                "problemMatcher": []
             }
         ],
         "inputs": [
@@ -147,3 +138,4 @@
     }
     
 }
+
