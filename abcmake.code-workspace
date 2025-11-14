@@ -22,78 +22,7 @@
         "version": "2.0.0",
         "tasks": [
             {
-                "label": "Test: run pytest suite",
-                "type": "shell",
-                "command": "python",
-                "args": [
-                    "-m",
-                    "pytest",
-                    "tests"
-                ],
-                "group": "test",
-                "problemMatcher": []
-            },
-            {
-                "label": "Example: build hello_with_find_package",
-                "type": "shell",
-                "command": "pwsh",
-                "args": [
-                    "-File",
-                    "build.ps1"
-                ],
-                "options": {
-                    "cwd": "${workspaceFolder}/examples/hello_with_find_package"
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "Configure (DEBUG)",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "-G",
-                    "Ninja",
-                    "-B",
-                    "build",
-                    "-S .",
-                    "--log-level=DEBUG"
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/${input:test}",
-                    "env": {
-                        "ABCMAKE_PATH": "${workspaceFolder}/src",
-                        "ABCMAKE_EMOJI": "1"
-                    }
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "Build package",
-                "type": "shell",
-                "command": "cmake",
-                "args": [
-                    "--build",
-                    "build",
-                    "--target",
-                    "all",
-                    "--config",
-                    "Release"
-                ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
-                "options": {
-                    "cwd": "${workspaceFolder}/tests/${input:test}"
-                },
-                "problemMatcher": []
-            },
-            {
-                "label": "Install package",
+                "label": "Build and Install abcmake",
                 "type": "shell",
                 "command": "pwsh",
                 "args": [
@@ -107,13 +36,99 @@
                 "problemMatcher": []
             },
             {
-                "label": "Generate single-file release",
+                "label": "Generate Single-File Release",
                 "type": "shell",
                 "command": "python",
                 "args": [
                     "scripts/generate_release.py"
                 ],
                 "group": "build",
+                "problemMatcher": []
+            },
+            {
+                "label": "Run Tests",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "-m",
+                    "pytest",
+                    "tests"
+                ],
+                "group": {
+                    "kind": "test",
+                    "isDefault": true
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Test Project: Configure",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S",
+                    "."
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/${input:test}",
+                    "env": {
+                        "ABCMAKE_PATH": "${workspaceFolder}/src",
+                        "ABCMAKE_EMOJI": "1"
+                    }
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Test Project: Configure (DEBUG)",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Ninja",
+                    "-B",
+                    "build",
+                    "-S",
+                    ".",
+                    "--log-level=DEBUG"
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/${input:test}",
+                    "env": {
+                        "ABCMAKE_PATH": "${workspaceFolder}/src",
+                        "ABCMAKE_EMOJI": "1"
+                    }
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Test Project: Build",
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "build",
+                    "--config",
+                    "Release"
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}/tests/${input:test}"
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Example: Build hello_with_find_package",
+                "type": "shell",
+                "command": "pwsh",
+                "args": [
+                    "-File",
+                    "build.ps1"
+                ],
+                "options": {
+                    "cwd": "${workspaceFolder}/examples/hello_with_find_package"
+                },
                 "problemMatcher": []
             }
         ],
