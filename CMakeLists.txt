@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(abcmake VERSION 6.2.0 LANGUAGES NONE)
+project(abcmake LANGUAGES NONE)
 
 # GNUInstallDirs for standard installation directories
 include(GNUInstallDirs)
