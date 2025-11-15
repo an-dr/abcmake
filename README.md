@@ -157,7 +157,7 @@ The single-file `ab.cmake` is generated automatically during tagged releases (`v
 Generate locally:
 
 ```bash
-python scripts/generate_release.py
+python scripts/build_single_file.py
 ```
 
 Download instead: [GitHub Releases](https://github.com/an-dr/abcmake/releases)
@@ -166,7 +166,7 @@ Download instead: [GitHub Releases](https://github.com/an-dr/abcmake/releases)
 
 1. Fork & branch.
 2. Run the test suite: `python -m unittest discover -v` (from `tests/`).
-3. Regenerate single file if you touch core logic: `python scripts/generate_release.py` (optional for dev).
+3. Regenerate single file if you touch core logic: `python scripts/build_single_file.py` (optional for dev).
 4. Keep PRs focused & update the **Unreleased** section in `CHANGELOG.md`.
 
 ## Changelog

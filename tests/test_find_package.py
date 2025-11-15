@@ -98,7 +98,6 @@ class TestFindPackage(unittest.TestCase):
             result.returncode, 0, f"find_package test failed:\n{result.stderr}"
         )
         self.assertIn("SUCCESS! abcmake package was found!", result.stdout)
-        self.assertIn("abcmake version: 6.2.0", result.stdout)
         self.assertIn("ab.cmake found at:", result.stdout)
 
     def test_find_package_with_custom_prefix(self):

@@ -118,7 +118,7 @@ def check_release(output_path: Path, expected: str) -> int:
         return 1
     if output_path.read_text(encoding="utf-8") != expected:
         print(f"❌ {output_path} is out of date.")
-        print("   Run: python scripts/generate_release.py")
+        print("   Run: python scripts/build_single_file.py")
         return 2
     print(f"✅ {output_path} is up to date.")
     return 0
