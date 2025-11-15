@@ -103,7 +103,11 @@ def build_replacement_dict(
             replacements[result[0]] = result[1]
     return replacements
 
-def build_release_content(src_dir: Path, main_file: str) -> str:
+def build_release_content(src_dir: Optional[Path] = None, main_file: Optional[str] = None) -> str:
+    if src_dir is None:
+        src_dir = Path(ABC_SRC_DIR)
+    if main_file is None:
+        main_file = MAIN_FILE
     main_path = src_dir / main_file
     content = read_file(main_path)
     replacements = build_replacement_dict(content, src_dir)
