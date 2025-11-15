@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 ABC_SRC_DIR = "src"
 MAIN_FILE = "ab.cmake"
-RELEASE_PATH = "release/ab.cmake"
+RELEASE_PATH = "dist/single_file/ab.cmake"
 
 
 def parse_args() -> argparse.Namespace:

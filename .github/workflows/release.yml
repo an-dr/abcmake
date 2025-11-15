@@ -19,8 +19,8 @@ jobs:
 
       - name: Generate release artifact
         run: |
-          python scripts/generate_release.py --check || python scripts/generate_release.py
-          echo "Generated release/ab.cmake"
+          python scripts/build_single_file.py --check || python scripts/build_single_file.py
+          echo "Generated dist/single_file/ab.cmake"
 
       - name: Capture version
         id: version
@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: abcmake-${{ steps.version.outputs.tag }}
-          path: release/ab.cmake
+          path: dist/single_file/ab.cmake
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -42,6 +42,6 @@ jobs:
             Automated release for ${{ steps.version.outputs.tag }}.
             The single-file module is attached as an asset.
           files: |
-            release/ab.cmake
+            dist/single_file/ab.cmake
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

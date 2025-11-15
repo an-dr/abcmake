@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(abcmake LANGUAGES NONE)
-
 include(${CMAKE_CURRENT_LIST_DIR}/src/version.cmake)
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${ABCMAKE_VERSION})
+project(abcmake VERSION ${ABCMAKE_VERSION} LANGUAGES NONE)
+
 
 # GNUInstallDirs for standard installation directories
 include(GNUInstallDirs)

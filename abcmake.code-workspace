@@ -22,7 +22,7 @@
         "version": "2.0.0",
         "tasks": [
             {
-                "label": "Build and Install abcmake",
+                "label": "Generate package",
                 "type": "shell",
                 "command": "pwsh",
                 "args": [
@@ -36,11 +36,11 @@
                 "problemMatcher": []
             },
             {
-                "label": "Generate Single-File Release",
+                "label": "Generate single file",
                 "type": "shell",
                 "command": "python",
                 "args": [
-                    "scripts/generate_release.py"
+                    "scripts/build_single_file.py"
                 ],
                 "group": "build",
                 "problemMatcher": []
