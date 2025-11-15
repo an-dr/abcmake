@@ -4,9 +4,8 @@
 
 Simple, component‑first CMake helper for small & medium C/C++ projects.
 
-[![version](https://img.shields.io/badge/version-6.1.0-green)](https://github.com/an-dr/abcmake/releases)
-[![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/an-dr/abcmake?label=latest%20release)](https://github.com/an-dr/abcmake/releases)
+[![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 </div>
 
