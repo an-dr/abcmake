@@ -4,9 +4,8 @@
 
 Simple, component‑first CMake helper for small & medium C/C++ projects.
 
-[![version](https://img.shields.io/badge/version-6.1.0-green)](https://github.com/an-dr/abcmake/releases)
-[![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/an-dr/abcmake?label=latest%20release)](https://github.com/an-dr/abcmake/releases)
+[![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
 
 </div>
 
@@ -157,7 +156,7 @@ The single-file `ab.cmake` is generated automatically during tagged releases (`v
 Generate locally:
 
 ```bash
-python scripts/generate_release.py
+python scripts/build_single_file.py
 ```
 
 Download instead: [GitHub Releases](https://github.com/an-dr/abcmake/releases)
@@ -166,7 +165,7 @@ Download instead: [GitHub Releases](https://github.com/an-dr/abcmake/releases)
 
 1. Fork & branch.
 2. Run the test suite: `python -m unittest discover -v` (from `tests/`).
-3. Regenerate single file if you touch core logic: `python scripts/generate_release.py` (optional for dev).
+3. Regenerate single file if you touch core logic: `python scripts/build_single_file.py` (optional for dev).
 4. Keep PRs focused & update the **Unreleased** section in `CHANGELOG.md`.
 
 ## Changelog

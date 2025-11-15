@@ -15,6 +15,7 @@
 # Source Code: https://github.com/an-dr/abcmake
 # *************************************************************************
 
+# %VERSION% 
 include(${CMAKE_CURRENT_LIST_DIR}/version.cmake)
 
 # Configure CMake
