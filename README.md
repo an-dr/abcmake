@@ -1,6 +1,6 @@
-﻿# abcmake
+﻿<div align="center">
 
-<div align="center">
+![logo](docs/README/header.drawio.svg)
 
 Simple, component‑first CMake helper for small & medium C/C++ projects.
 
@@ -13,13 +13,13 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 
 ## Why abcmake?
 
-| Problem | What abcmake Gives You |
-|---------|------------------------|
+| Problem                                         | What abcmake Gives You                                     |
+| ----------------------------------------------- | ---------------------------------------------------------- |
 | Repeating `add_library` + globbing everywhere | Single `add_main_component()` + auto component discovery |
-| Hard to reuse internal modules | Component folders become portable units |
-| Tedious dependency wiring | `target_link_components()` + optional registry by name |
-| Vendored CMake packages cumbersome | Auto‑detect `*Config.cmake` in `components/` and link |
-| Monolithic CMakeLists.txt growth | Split naturally by component directory |
+| Hard to reuse internal modules                  | Component folders become portable units                    |
+| Tedious dependency wiring                       | `target_link_components()` + optional registry by name   |
+| Vendored CMake packages cumbersome              | Auto‑detect `*Config.cmake` in `components/` and link |
+| Monolithic CMakeLists.txt growth                | Split naturally by component directory                     |
 
 ## Features
 
@@ -31,31 +31,31 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 - Generates `compile_commands.json`.
 - Install step for each built target near the build dir.
 - Single-file distributable (`ab.cmake`) published per GitHub Release.
-
 - [abcmake](#abcmake)
-    - [Why abcmake?](#why-abcmake)
-    - [Features](#features)
-    - [Installation - Single File](#installation---single-file)
-    - [Installation - Packaged](#installation---packaged)
-        - [Automated (All Platforms)](#automated-all-platforms)
-        - [Environment Setup](#environment-setup)
-            - [Linux/macOS](#linuxmacos)
-            - [Windows (PowerShell)](#windows-powershell)
-    - [Quick Start](#quick-start)
-    - [Concepts](#concepts)
-    - [Public API](#public-api)
-        - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
-        - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
-        - [`register_components(<path> ...)`](#register_componentspath-)
-        - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
-            - [Auto Package Detection](#auto-package-detection)
-    - [Advanced Usage](#advanced-usage)
-    - [Configuration](#configuration)
-    - [Limitations](#limitations)
-    - [Release \& Single-File Build](#release--single-file-build)
-    - [Contributing](#contributing)
-    - [Changelog](#changelog)
-    - [License](#license)
+
+  - [Why abcmake?](#why-abcmake)
+  - [Features](#features)
+  - [Installation - Single File](#installation---single-file)
+  - [Installation - Packaged](#installation---packaged)
+    - [Automated (All Platforms)](#automated-all-platforms)
+    - [Environment Setup](#environment-setup)
+      - [Linux/macOS](#linuxmacos)
+      - [Windows (PowerShell)](#windows-powershell)
+  - [Quick Start](#quick-start)
+  - [Concepts](#concepts)
+  - [Public API](#public-api)
+    - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
+    - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
+    - [`register_components(<path> ...)`](#register_componentspath-)
+    - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
+      - [Auto Package Detection](#auto-package-detection)
+  - [Advanced Usage](#advanced-usage)
+  - [Configuration](#configuration)
+  - [Limitations](#limitations)
+  - [Release \& Single-File Build](#release--single-file-build)
+  - [Contributing](#contributing)
+  - [Changelog](#changelog)
+  - [License](#license)
 
 ## Installation - Single File
 
@@ -77,6 +77,7 @@ cmake -P install.cmake
 ```
 
 **Installation paths:**
+
 - **Linux/Unix**: `~/.local/share/cmake/abcmake`
 - **macOS**: `~/Library/Application Support/CMake/share/cmake/abcmake`
 - **Windows**: `%APPDATA%/CMake/share/cmake/abcmake`
@@ -102,7 +103,6 @@ list(APPEND CMAKE_PREFIX_PATH "$ENV{APPDATA}/CMake")
 
 Or set permanently in PowerShell profile:
 
-    
 ```powershell
 $env:CMAKE_PREFIX_PATH = "$env:APPDATA\CMake;$env:CMAKE_PREFIX_PATH"
 ```
@@ -145,12 +145,12 @@ add_component(${PROJECT_NAME})
 
 ## Concepts
 
-| Term | Meaning |
-|------|---------|
-| Component | A folder with its own `CMakeLists.txt` that calls `add_component` or `add_main_component`. |
-| Main component | The top-level executable (or library) defined with `add_main_component`. |
-| Registry | A global list of discovered components (added via `register_components`). |
-| Auto package | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package. |
+| Term           | Meaning                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Component      | A folder with its own `CMakeLists.txt` that calls `add_component` or `add_main_component`. |
+| Main component | The top-level executable (or library) defined with `add_main_component`.                       |
+| Registry       | A global list of discovered components (added via `register_components`).                      |
+| Auto package   | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package.    |
 
 ## Public API
 
@@ -207,8 +207,8 @@ add_main_component(App SOURCE_DIR source INCLUDE_DIR include)
 
 Environment variables:
 
-| Variable | Effect |
-|----------|--------|
+| Variable            | Effect                      |
+| ------------------- | --------------------------- |
 | `ABCMAKE_EMOJI=1` | Fancy emoji output in logs. |
 
 ## Limitations
