@@ -21,13 +21,13 @@ else()
     set(INSTALL_PATH "${INSTALL_PREFIX}/share/cmake/abcmake")
 endif()
 
-# Get script directory
+# Get script directory (should be package root)
 get_filename_component(SCRIPT_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
-set(SOURCE_DIR "${SCRIPT_DIR}/dist/package/share/cmake/abcmake")
+set(SOURCE_DIR "${SCRIPT_DIR}/share/cmake/abcmake")
 
 # Verify source exists
 if(NOT EXISTS "${SOURCE_DIR}")
-    message(FATAL_ERROR "Source directory not found: ${SOURCE_DIR}\nRun this script from the extracted zip root.")
+    message(FATAL_ERROR "Source directory not found: ${SOURCE_DIR}\nRun this script from the extracted package root (where install.cmake is located).")
 endif()
 
 # Remove old installation

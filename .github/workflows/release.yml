@@ -22,6 +22,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build zip
 
+      - name: Capture version
+        id: version
+        run: |
+          TAG_REF="${GITHUB_REF##*/}"
+          VERSION="${TAG_REF#v}"
+          echo "tag=$TAG_REF" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Generate release artifact
         run: |
           python scripts/build_single_file.py --check || python scripts/build_single_file.py
@@ -29,19 +37,7 @@ jobs:
 
       - name: Build CMake package
         run: |
-          pwsh scripts/build_package.ps1
-
-      - name: Capture version
-        id: version
-        run: |
-          TAG_REF="${GITHUB_REF##*/}"
-          echo "tag=$TAG_REF" >> $GITHUB_OUTPUT
-
-      - name: Archive CMake package
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          mkdir -p dist/release
-          zip -r "dist/release/abcmake-package-${TAG}.zip" dist/package
+          pwsh scripts/build_package.ps1 -Version "${{ steps.version.outputs.version }}"
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
@@ -49,7 +45,7 @@ jobs:
           name: abcmake-${{ steps.version.outputs.tag }}
           path: |
             dist/single_file/ab.cmake
-            dist/release/abcmake-package-${{ steps.version.outputs.tag }}.zip
+            dist/abcmake-package-v${{ steps.version.outputs.version }}.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -60,6 +56,6 @@ jobs:
             The single-file module and CMake package are attached as assets.
           files: |
             dist/single_file/ab.cmake
-            dist/release/abcmake-package-${{ steps.version.outputs.tag }}.zip
+            dist/abcmake-package-v${{ steps.version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -61,14 +61,22 @@ install(FILES
     DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
 )
 
-# Copy installer and docs to package root
+# Install LICENSE to abcmake subdirectory
+install(FILES
+    LICENSE
+    DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}/abcmake
+)
+
+# Copy installer and docs to package root (CMAKE_INSTALL_PREFIX)
 install(CODE "
     file(COPY ${CMAKE_CURRENT_BINARY_DIR}/install.cmake 
-         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
     file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE 
-         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
     file(COPY ${CMAKE_CURRENT_LIST_DIR}/README.md 
-         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
+    
+    message(STATUS \"Package root files installed to: \${CMAKE_INSTALL_PREFIX}\")
 ")
 
 # Display installation information
