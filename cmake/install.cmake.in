@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.16)
+
+set(ABCMAKE_VERSION "@ABCMAKE_VERSION@")
+
+# Detect OS and set installation paths
+if(WIN32)
+    # Windows: Use %APPDATA%
+    if(DEFINED ENV{APPDATA})
+        set(INSTALL_PREFIX "$ENV{APPDATA}/CMake")
+    else()
+        set(INSTALL_PREFIX "$ENV{USERPROFILE}/CMake")
+    endif()
+    set(INSTALL_PATH "${INSTALL_PREFIX}/share/cmake/abcmake")
+elseif(APPLE)
+    # macOS: Use ~/Library
+    set(INSTALL_PREFIX "$ENV{HOME}/Library/Application Support/CMake")
+    set(INSTALL_PATH "${INSTALL_PREFIX}/share/cmake/abcmake")
+else()
+    # Linux/Unix: Use ~/.local
+    set(INSTALL_PREFIX "$ENV{HOME}/.local")
+    set(INSTALL_PATH "${INSTALL_PREFIX}/share/cmake/abcmake")
+endif()
+
+# Get script directory
+get_filename_component(SCRIPT_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+set(SOURCE_DIR "${SCRIPT_DIR}/dist/package/share/cmake/abcmake")
+
+# Verify source exists
+if(NOT EXISTS "${SOURCE_DIR}")
+    message(FATAL_ERROR "Source directory not found: ${SOURCE_DIR}\nRun this script from the extracted zip root.")
+endif()
+
+# Remove old installation
+if(EXISTS "${INSTALL_PATH}")
+    message(STATUS "Removing old installation: ${INSTALL_PATH}")
+    file(REMOVE_RECURSE "${INSTALL_PATH}")
+endif()
+
+# Install
+message(STATUS "Installing abcmake ${ABCMAKE_VERSION} to: ${INSTALL_PATH}")
+file(COPY "${SOURCE_DIR}/" DESTINATION "${INSTALL_PATH}")
+
+# Verify installation
+if(EXISTS "${INSTALL_PATH}/ab.cmake")
+    message(STATUS "[SUCCESS] abcmake ${ABCMAKE_VERSION} installed successfully!")
+    message(STATUS "")
+    message(STATUS "Usage in CMakeLists.txt:")
+    message(STATUS "  find_package(abcmake @ABCMAKE_VERSION_MAJOR@.@ABCMAKE_VERSION_MINOR@ REQUIRED)")
+    message(STATUS "  ab_component(mylib)")
+    message(STATUS "")
+    
+    if(WIN32)
+        message(STATUS "[WARNING]  Windows users: Add to system PATH or set in CMakeLists.txt:")
+        message(STATUS "  list(APPEND CMAKE_PREFIX_PATH \"${INSTALL_PREFIX}\")")
+    elseif(UNIX AND NOT APPLE)
+        message(STATUS "[WARNING] Linux: Add to ~/.bashrc or ~/.zshrc:")
+        message(STATUS "  export CMAKE_PREFIX_PATH=\"${INSTALL_PREFIX}:\$CMAKE_PREFIX_PATH\"")
+    endif()
+else()
+    message(FATAL_ERROR "Installation failed - ab.cmake not found")
+endif()

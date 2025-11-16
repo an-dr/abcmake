@@ -28,6 +28,7 @@ install(FILES
     src/abcmake/add_component.cmake
     src/abcmake/register_components.cmake
     src/abcmake/target_link_components.cmake
+    LICENSE
     DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}/abcmake
 )
 
@@ -37,6 +38,13 @@ configure_package_config_file(
     "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfig.cmake"
     INSTALL_DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
     PATH_VARS ABCMAKE_INSTALL_CMAKEDIR
+)
+
+# Configure install script
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/install.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/install.cmake
+    @ONLY
 )
 
 # Generate the version file for the config file
@@ -52,6 +60,16 @@ install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfigVersion.cmake"
     DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
 )
+
+# Copy installer and docs to package root
+install(CODE "
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/install.cmake 
+         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+    file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE 
+         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+    file(COPY ${CMAKE_CURRENT_LIST_DIR}/README.md 
+         DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR})
+")
 
 # Display installation information
 message(STATUS "abcmake version ${PROJECT_VERSION}")

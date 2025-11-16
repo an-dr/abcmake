@@ -32,13 +32,80 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 - Install step for each built target near the build dir.
 - Single-file distributable (`ab.cmake`) published per GitHub Release.
 
-## Installation
+- [abcmake](#abcmake)
+    - [Why abcmake?](#why-abcmake)
+    - [Features](#features)
+    - [Installation - Single File](#installation---single-file)
+    - [Installation - Packaged](#installation---packaged)
+        - [Automated (All Platforms)](#automated-all-platforms)
+        - [Environment Setup](#environment-setup)
+            - [Linux/macOS](#linuxmacos)
+            - [Windows (PowerShell)](#windows-powershell)
+    - [Quick Start](#quick-start)
+    - [Concepts](#concepts)
+    - [Public API](#public-api)
+        - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
+        - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
+        - [`register_components(<path> ...)`](#register_componentspath-)
+        - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
+            - [Auto Package Detection](#auto-package-detection)
+    - [Advanced Usage](#advanced-usage)
+    - [Configuration](#configuration)
+    - [Limitations](#limitations)
+    - [Release \& Single-File Build](#release--single-file-build)
+    - [Contributing](#contributing)
+    - [Changelog](#changelog)
+    - [License](#license)
+
+## Installation - Single File
 
 1. Download `ab.cmake` from the latest [GitHub Release](https://github.com/an-dr/abcmake/releases).
 2. Place it at your project root next to `CMakeLists.txt`.
 3. `include(ab.cmake)` in your root `CMakeLists.txt`.
 
 Optional (submodules / vendored): you can also keep the whole repository and include via `set(ABCMAKE_PATH path/to/src)` & `include(${ABCMAKE_PATH}/ab.cmake)`.
+
+## Installation - Packaged
+
+### Automated (All Platforms)
+
+```bash
+# Extract and run installer
+unzip abcmake-package-v6_2_1.zip
+cd abcmake-package-v6_2_1
+cmake -P install.cmake
+```
+
+**Installation paths:**
+- **Linux/Unix**: `~/.local/share/cmake/abcmake`
+- **macOS**: `~/Library/Application Support/CMake/share/cmake/abcmake`
+- **Windows**: `%APPDATA%/CMake/share/cmake/abcmake`
+
+### Environment Setup
+
+#### Linux/macOS
+
+Add to `~/.bashrc` or `~/.zshrc`:
+
+```bash
+export CMAKE_PREFIX_PATH="$HOME/.local:$CMAKE_PREFIX_PATH"  # Linux
+export CMAKE_PREFIX_PATH="$HOME/Library/Application Support/CMake:$CMAKE_PREFIX_PATH"  # macOS
+```
+
+#### Windows (PowerShell)
+
+Add to your CMakeLists.txt:
+
+```cmake
+list(APPEND CMAKE_PREFIX_PATH "$ENV{APPDATA}/CMake")
+```
+
+Or set permanently in PowerShell profile:
+
+    
+```powershell
+$env:CMAKE_PREFIX_PATH = "$env:APPDATA\CMake;$env:CMAKE_PREFIX_PATH"
+```
 
 ## Quick Start
 
@@ -47,7 +114,7 @@ Minimal root `CMakeLists.txt`:
 ```cmake
 cmake_minimum_required(VERSION 3.15)
 project(HelloWorld)
-include(ab.cmake)
+find_package(abcmake REQUIRED) # or include(ab.cmake) for single-file
 add_main_component(${PROJECT_NAME})
 ```
 
@@ -176,3 +243,4 @@ See [CHANGELOG.md](CHANGELOG.md) for structured history.
 
 MIT License © Andrei Gramakov.
 
+See [LICENSE](LICENSE) for details.
