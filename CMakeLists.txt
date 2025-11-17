@@ -62,8 +62,6 @@ install(FILES
 
 # Copy installer and docs to package root (CMAKE_INSTALL_PREFIX)
 install(CODE "
-    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/install.cmake 
-         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
     file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE 
          DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
     file(COPY ${CMAKE_CURRENT_LIST_DIR}/README.md 
