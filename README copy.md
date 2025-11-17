@@ -13,92 +13,108 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 
 ## Why abcmake?
 
-| Problem                                       | What abcmake Gives You                                   |
-| --------------------------------------------- | -------------------------------------------------------- |
+| Problem                                         | What abcmake Gives You                                     |
+| ----------------------------------------------- | ---------------------------------------------------------- |
 | Repeating `add_library` + globbing everywhere | Single `add_main_component()` + auto component discovery |
-| Hard to reuse internal modules                | Component folders become portable units                  |
-| Tedious dependency wiring                     | `target_link_components()` + optional registry by name   |
-| Vendored CMake packages cumbersome            | Auto‑detect `*Config.cmake` in `components/` and link    |
-| Monolithic CMakeLists.txt growth              | Split naturally by component directory                   |
+| Hard to reuse internal modules                  | Component folders become portable units                    |
+| Tedious dependency wiring                       | `target_link_components()` + optional registry by name   |
+| Vendored CMake packages cumbersome              | Auto‑detect `*Config.cmake` in `components/` and link |
+| Monolithic CMakeLists.txt growth                | Split naturally by component directory                     |
 
 ## Features
 
-- Zero external Python/CMake dependency beyond stock CMake (>= 3.15).
+- Zero external Python/CMake dependency beyond stock CMake (>= 3.5).
 - Conventional project layout with overridable source/include directories.
 - Automatic recursive discovery & linking of nested components.
 - Registry for linking components by *name* rather than path.
 - Auto-detection of vendored CMake packages (`*Config.cmake`).
-- Generates `compile_commands.json` by default.
+- Generates `compile_commands.json`.
 - Install step for each built target near the build dir.
 - Single-file distributable (`ab.cmake`) published per GitHub Release.
+- [abcmake](#abcmake)
 
-## Table Of Contents
-
-- [Why abcmake?](#why-abcmake)
-- [Features](#features)
-- [Table Of Contents](#table-of-contents)
-- [Quick Start](#quick-start)
-    - [Install](#install)
-    - [Use](#use)
-- [Concepts](#concepts)
-- [Public API](#public-api)
+  - [Why abcmake?](#why-abcmake)
+  - [Features](#features)
+  - [Installation - Single File](#installation---single-file)
+  - [Installation - Packaged](#installation---packaged)
+    - [Automated (All Platforms)](#automated-all-platforms)
+    - [Environment Setup](#environment-setup)
+      - [Linux/macOS](#linuxmacos)
+      - [Windows (PowerShell)](#windows-powershell)
+  - [Quick Start](#quick-start)
+  - [Concepts](#concepts)
+  - [Public API](#public-api)
     - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
     - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
     - [`register_components(<path> ...)`](#register_componentspath-)
     - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
-        - [Auto Package Detection](#auto-package-detection)
-- [Advanced Usage](#advanced-usage)
-- [Limitations](#limitations)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-- [License](#license)
+      - [Auto Package Detection](#auto-package-detection)
+  - [Advanced Usage](#advanced-usage)
+  - [Configuration](#configuration)
+  - [Limitations](#limitations)
+  - [Release \& Single-File Build](#release--single-file-build)
+  - [Contributing](#contributing)
+  - [Changelog](#changelog)
+  - [License](#license)
 
-## Quick Start
+## Installation - Single File
 
-### Install
+1. Download `ab.cmake` from the latest [GitHub Release](https://github.com/an-dr/abcmake/releases).
+2. Place it at your project root next to `CMakeLists.txt`.
+3. `include(ab.cmake)` in your root `CMakeLists.txt`.
 
-**Project Scope**. Download a single-file distribution and put near your CMakeLists.txt:
+Optional (submodules / vendored): you can also keep the whole repository and include via `set(ABCMAKE_PATH path/to/src)` & `include(${ABCMAKE_PATH}/ab.cmake)`.
 
-- <https://github.com/an-dr/abcmake/releases>
+## Installation - Packaged
 
-**User Scope**. Clone the repo and install it in your system:
+### Automated (All Platforms)
 
 ```bash
-git clone https://github.com/you/abcmake.git
-cd abcmake
-cmake -B build
-cmake --install build --prefix ~/.local
+# Extract and run installer
+unzip abcmake-package-v6_2_1.zip
+cd abcmake-package-v6_2_1
+cmake -P install.cmake
 ```
 
-For Windows:
+**Installation paths:**
 
-- Use `$env:LOCALAPPDATA\CMake` instead of `~/.local`  also append the path:
+- **Linux/Unix**: `~/.local/share/cmake/abcmake`
+- **macOS**: `~/Library/Application Support/CMake/share/cmake/abcmake`
+- **Windows**: `%APPDATA%/CMake/share/cmake/abcmake`
+
+### Environment Setup
+
+#### Linux/macOS
+
+Add to `~/.bashrc` or `~/.zshrc`:
+
+```bash
+export CMAKE_PREFIX_PATH="$HOME/.local:$CMAKE_PREFIX_PATH"  # Linux
+export CMAKE_PREFIX_PATH="$HOME/Library/Application Support/CMake:$CMAKE_PREFIX_PATH"  # macOS
+```
+
+#### Windows (PowerShell)
+
+Add to your CMakeLists.txt:
 
 ```cmake
-list(APPEND CMAKE_PREFIX_PATH "$ENV{LOCALAPPDATA}/CMake")
-find_package(abcmake REQUIRED)
+list(APPEND CMAKE_PREFIX_PATH "$ENV{APPDATA}/CMake")
 ```
 
-**System-wide Scope**. Change prefix to `/usr/local` (Linux) or `C:\Program Files\CMake` (Windows), run with elevated privileges
+Or set permanently in PowerShell profile:
 
-```bash
-git clone https://github.com/you/abcmake.git
-cd abcmake
-cmake -B build
-sudo cmake --install build --prefix /usr/local
+```powershell
+$env:CMAKE_PREFIX_PATH = "$env:APPDATA\CMake;$env:CMAKE_PREFIX_PATH"
 ```
 
-### Use
+## Quick Start
 
 Minimal root `CMakeLists.txt`:
 
 ```cmake
 cmake_minimum_required(VERSION 3.15)
 project(HelloWorld)
-
-find_package(abcmake REQUIRED) 
-# or include(ab.cmake) for single-file distribution
-
+find_package(abcmake REQUIRED) # or include(ab.cmake) for single-file
 add_main_component(${PROJECT_NAME})
 ```
 
@@ -123,20 +139,18 @@ Add a component (`components/mylib/CMakeLists.txt`):
 ```cmake
 cmake_minimum_required(VERSION 3.15)
 project(mylib)
-
-find_package(abcmake REQUIRED)
-
+include($ENV{ABCMAKE_PATH}/ab.cmake) # or relative path if local copy
 add_component(${PROJECT_NAME})
 ```
 
 ## Concepts
 
-| Term           | Meaning                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------ |
+| Term           | Meaning                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------ |
 | Component      | A folder with its own `CMakeLists.txt` that calls `add_component` or `add_main_component`. |
-| Main component | The top-level executable (or library) defined with `add_main_component`.                   |
-| Registry       | A global list of discovered components (added via `register_components`).                  |
-| Auto package   | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package.  |
+| Main component | The top-level executable (or library) defined with `add_main_component`.                       |
+| Registry       | A global list of discovered components (added via `register_components`).                      |
+| Auto package   | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package.    |
 
 ## Public API
 
@@ -189,16 +203,37 @@ Custom project layout (no `src/`):
 add_main_component(App SOURCE_DIR source INCLUDE_DIR include)
 ```
 
+## Configuration
+
+Environment variables:
+
+| Variable            | Effect                      |
+| ------------------- | --------------------------- |
+| `ABCMAKE_EMOJI=1` | Fancy emoji output in logs. |
+
 ## Limitations
 
 - One logical component per `CMakeLists.txt` (keep them focused).
 - Designed for small/medium modular trees; very large monorepos may prefer native CMake patterns.
 
+## Release & Single-File Build
+
+The single-file `ab.cmake` is generated automatically during tagged releases (`v*.*.*`). It is not stored in the repository.
+
+Generate locally:
+
+```bash
+python scripts/build_single_file.py
+```
+
+Download instead: [GitHub Releases](https://github.com/an-dr/abcmake/releases)
+
 ## Contributing
 
 1. Fork & branch.
 2. Run the test suite: `python -m unittest discover -v` (from `tests/`).
-3. Keep PRs focused & update the **Unreleased** section in `CHANGELOG.md`.
+3. Regenerate single file if you touch core logic: `python scripts/build_single_file.py` (optional for dev).
+4. Keep PRs focused & update the **Unreleased** section in `CHANGELOG.md`.
 
 ## Changelog
 

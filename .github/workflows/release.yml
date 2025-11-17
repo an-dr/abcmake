@@ -3,7 +3,7 @@ name: Generate Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   build-release:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-            python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install CMake and Ninja
         run: |
@@ -35,17 +35,12 @@ jobs:
           python scripts/build_single_file.py --check || python scripts/build_single_file.py
           echo "Generated dist/single_file/ab.cmake"
 
-      - name: Build CMake package
-        run: |
-          pwsh scripts/build_package.ps1 -Version "${{ steps.version.outputs.version }}"
-
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: abcmake-${{ steps.version.outputs.tag }}
           path: |
             dist/single_file/ab.cmake
-            dist/abcmake-package-v${{ steps.version.outputs.version }}.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -56,6 +51,5 @@ jobs:
             The single-file module and CMake package are attached as assets.
           files: |
             dist/single_file/ab.cmake
-            dist/abcmake-package-v${{ steps.version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

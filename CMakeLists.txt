@@ -40,13 +40,6 @@ configure_package_config_file(
     PATH_VARS ABCMAKE_INSTALL_CMAKEDIR
 )
 
-# Configure install script
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/install.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/install.cmake
-    @ONLY
-)
-
 # Generate the version file for the config file
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfigVersion.cmake"
