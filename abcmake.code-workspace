@@ -21,23 +21,33 @@
     "tasks": {
         "version": "2.0.0",
         "tasks": [
-            // run scripts\generate_release.py
             {
-                "label": "generate_release",
+                "label": "Generate single file",
                 "type": "shell",
                 "command": "python",
                 "args": [
-                    "scripts/generate_release.py"
+                    "scripts/build_single_file.py"
+                ],
+                "group": "build",
+                "problemMatcher": []
+            },
+            {
+                "label": "Run Tests",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "-m",
+                    "pytest",
+                    "tests"
                 ],
                 "group": {
-                    "kind": "build",
+                    "kind": "test",
                     "isDefault": true
                 },
                 "problemMatcher": []
-                
             },
             {
-                "label": "Configure",
+                "label": "Test Project: Configure",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -45,12 +55,9 @@
                     "Ninja",
                     "-B",
                     "build",
-                    "-S ."
+                    "-S",
+                    "."
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
                 "options": {
                     "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
@@ -61,7 +68,7 @@
                 "problemMatcher": []
             },
             {
-                "label": "Configure (DEBUG)",
+                "label": "Test Project: Configure (DEBUG)",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
@@ -69,13 +76,10 @@
                     "Ninja",
                     "-B",
                     "build",
-                    "-S .",
+                    "-S",
+                    ".",
                     "--log-level=DEBUG"
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
                 "options": {
                     "cwd": "${workspaceFolder}/tests/${input:test}",
                     "env": {
@@ -85,45 +89,33 @@
                 },
                 "problemMatcher": []
             },
-            // Cmake build
             {
-                "label": "Build",
+                "label": "Test Project: Build",
                 "type": "shell",
                 "command": "cmake",
                 "args": [
                     "--build",
                     "build",
-                    "--target",
-                    "all",
                     "--config",
                     "Release"
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
                 "options": {
                     "cwd": "${workspaceFolder}/tests/${input:test}"
                 },
-                "problemMatcher": [],
+                "problemMatcher": []
             },
-            // Install to workspace/install
             {
-                "label": "Install",
+                "label": "Example: Build hello_with_find_package",
                 "type": "shell",
-                "command": "cmake",
+                "command": "pwsh",
                 "args": [
-                    "--install",
-                    "build",
+                    "-File",
+                    "build.ps1"
                 ],
-                "group": {
-                    "kind": "build",
-                    "isDefault": true
-                },
                 "options": {
-                    "cwd": "${workspaceFolder}/tests/${input:test}",
+                    "cwd": "${workspaceFolder}/examples/hello_with_find_package"
                 },
-                "problemMatcher": [],
+                "problemMatcher": []
             }
         ],
         "inputs": [
@@ -147,3 +139,4 @@
     }
     
 }
+

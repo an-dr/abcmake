@@ -3,7 +3,7 @@ name: Generate Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   build-release:
@@ -15,24 +15,32 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-            python-version: '3.x'
+          python-version: "3.x"
 
-      - name: Generate release artifact
+      - name: Install CMake and Ninja
         run: |
-          python scripts/generate_release.py --check || python scripts/generate_release.py
-          echo "Generated release/ab.cmake"
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build zip
 
       - name: Capture version
         id: version
         run: |
           TAG_REF="${GITHUB_REF##*/}"
+          VERSION="${TAG_REF#v}"
           echo "tag=$TAG_REF" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate release artifact
+        run: |
+          python scripts/build_single_file.py --check || python scripts/build_single_file.py
+          echo "Generated dist/single_file/ab.cmake"
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: abcmake-${{ steps.version.outputs.tag }}
-          path: release/ab.cmake
+          path: |
+            dist/single_file/ab.cmake
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -40,8 +48,8 @@ jobs:
           name: abcmake ${{ steps.version.outputs.tag }}
           body: |
             Automated release for ${{ steps.version.outputs.tag }}.
-            The single-file module is attached as an asset.
+            The single-file module and CMake package are attached as assets.
           files: |
-            release/ab.cmake
+            dist/single_file/ab.cmake
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -65,7 +65,7 @@ class TestsRelease(unittest.TestCase):
     def test_release_updated(self):
         """Validate that the generated single-file content matches manual inline expansion.
 
-        Dynamically generate the release content using scripts/generate_release.py (importing its build
+        Dynamically generate the release content using scripts/build_single_file.py (importing its build
         function) and compare it with the manual include expansion performed here.
         """
         set_cwd_to_repo()
@@ -80,10 +80,10 @@ class TestsRelease(unittest.TestCase):
             manual_expanded = manual_expanded.replace(old, new)
 
         # Dynamic generation via release script
-        gen_path = os.path.join("scripts", "generate_release.py")
+        gen_path = os.path.join("scripts", "build_single_file.py")
         ns = runpy.run_path(gen_path, run_name="__generate_release__")
         if "build_release_content" not in ns:
-            self.fail("build_release_content not found in generate_release.py")
+            self.fail("build_release_content not found in build_single_file.py")
         generated = ns["build_release_content"]()
 
         self.assertEqual(
