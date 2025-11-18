@@ -1,6 +1,16 @@
 # ==============================================================================
 # target_link_components.cmake =================================================
 
+# Get appropriate visibility for target_link_libraries based on target type
+function(_abcmake_get_link_visibility TARGETNAME OUT_VISIBILITY)
+    get_target_property(_type ${TARGETNAME} TYPE)
+    if (_type STREQUAL "INTERFACE_LIBRARY")
+        set(${OUT_VISIBILITY} INTERFACE PARENT_SCOPE)
+    else()
+        set(${OUT_VISIBILITY} PRIVATE PARENT_SCOPE)
+    endif()
+endfunction()
+
 # Link internal abcmake component if present.
 # Returns TRUE in OUT_LINKED if a link action happened.
 function(_abcmake_try_link_abcmake_component PROCESS_LEVEL TARGETNAME COMPONENTPATH OUT_LINKED)
@@ -9,7 +19,8 @@ function(_abcmake_try_link_abcmake_component PROCESS_LEVEL TARGETNAME COMPONENTP
     if (ver)
         _abcmake_get_prop_dir(${COMPONENTPATH} ${ABCMAKE_DIRPROP_TARGETS} to_link)
         if (to_link)
-            target_link_libraries(${TARGETNAME} PRIVATE ${to_link})
+            _abcmake_get_link_visibility(${TARGETNAME} _vis)
+            target_link_libraries(${TARGETNAME} ${_vis} ${to_link})
             _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked ${to_link}")
             set(${OUT_LINKED} TRUE PARENT_SCOPE)
         endif()
@@ -23,6 +34,7 @@ function(_abcmake_try_link_cmake_package PROCESS_LEVEL TARGETNAME COMPONENTPATH 
     set(linked FALSE)
     if (EXISTS ${COMPONENTPATH})
         file(GLOB _abc_pkg_configs "${COMPONENTPATH}/*Config.cmake")
+        _abcmake_get_link_visibility(${TARGETNAME} _vis)
         foreach(_abc_pkg_cfg ${_abc_pkg_configs})
             get_filename_component(_abc_pkg_cfg_name "${_abc_pkg_cfg}" NAME_WE)
             string(REGEX REPLACE "Config$" "" _abc_pkg_name "${_abc_pkg_cfg_name}")
@@ -31,11 +43,11 @@ function(_abcmake_try_link_cmake_package PROCESS_LEVEL TARGETNAME COMPONENTPATH 
             endif()
             find_package(${_abc_pkg_name} CONFIG PATHS "${COMPONENTPATH}" NO_DEFAULT_PATH QUIET)
             if (TARGET ${_abc_pkg_name}::${_abc_pkg_name})
-                target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name}::${_abc_pkg_name})
+                target_link_libraries(${TARGETNAME} ${_vis} ${_abc_pkg_name}::${_abc_pkg_name})
                 _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package ${_abc_pkg_name}::${_abc_pkg_name}")
                 set(linked TRUE)
             elseif (TARGET ${_abc_pkg_name})
-                target_link_libraries(${TARGETNAME} PRIVATE ${_abc_pkg_name})
+                target_link_libraries(${TARGETNAME} ${_vis} ${_abc_pkg_name})
                 _abcmake_log_ok(${PROCESS_LEVEL} "${TARGETNAME}: linked package target ${_abc_pkg_name}")
                 set(linked TRUE)
             else()
