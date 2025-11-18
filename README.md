@@ -43,7 +43,7 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 - [Concepts](#concepts)
 - [Public API](#public-api)
     - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
-    - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
+    - [`add_component(<name> [SHARED|INTERFACE] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-sharedinterface-include_dir--source_dir-)
     - [`register_components(<path> ...)`](#register_componentspath-)
     - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
         - [Auto Package Detection](#auto-package-detection)
@@ -148,9 +148,9 @@ Creates an executable (or top-level library) and automatically:
 - Adds include dirs (default `include` if exists).
 - Discovers & links nested components in `components/`.
 
-### `add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`
+### `add_component(<name> [SHARED|INTERFACE] [INCLUDE_DIR ...] [SOURCE_DIR ...])`
 
-Defines a static (default) or shared library component with the same discovery & inclusion mechanics.
+Defines a static (default), shared, or interface library component with the same discovery & inclusion mechanics. Use `INTERFACE` for header-only libraries or source-distribution libraries where code compiles in the consumer's context.
 
 ### `register_components(<path> ...)`
 

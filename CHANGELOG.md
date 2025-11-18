@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 - ...
 
+## [6.3.0] - 2025-11-18
+
+### Added
+
+- Support of header-only and source libraries via INTERFACE
 
 ## [6.2.0] - 2025-09-17
 

@@ -34,6 +34,9 @@ class TestBuild(TestCMake):
         # and a non-abcmake CMake library (lib_exclamation). Ensures package auto-detection works.
         self.build_cmake("test_cmake_package")
 
+    def test_interface(self):
+        self.build_cmake("test_interface")
+
 
 if __name__ == '__main__':
     unittest.main()
