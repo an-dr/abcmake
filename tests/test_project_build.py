@@ -41,6 +41,10 @@ class TestBuild(TestCMake):
         # Test INTERFACE library linking to other components via target_link_components
         self.build_cmake("test_interface_link")
 
+    def test_component_set(self):
+        # Component set registers nested components for name-based linking
+        self.build_cmake("test_component_set")
+
 
 if __name__ == '__main__':
     unittest.main()

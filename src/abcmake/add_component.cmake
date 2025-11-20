@@ -124,6 +124,47 @@ function(_abcmake_target_init TARGETNAME)
 
 endfunction()
 
+# Add a component set that only registers nested components (no targets)
+# @param PATH - base directory containing components (defaults to abcmake components dir)
+# @param COMPONENTS - names of subdirectories to register
+# @param REGISTER_ALL - if set, register every subdirectory under PATH
+function(add_component_set)
+    set(flags REGISTER_ALL)
+    set(args)
+    set(listArgs PATH COMPONENTS)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+
+    if (NOT arg_PATH)
+        _abcmake_get_components(arg_PATH)
+    endif()
+
+    set(base_dir ${arg_PATH})
+    if (NOT IS_ABSOLUTE "${base_dir}")
+        set(base_dir "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}")
+    endif()
+
+    set(to_register ${arg_COMPONENTS})
+
+    if (arg_REGISTER_ALL)
+        file(GLOB children RELATIVE "${base_dir}" "${base_dir}/*")
+        foreach(child ${children})
+            if (IS_DIRECTORY "${base_dir}/${child}")
+                list(APPEND to_register ${child})
+            endif()
+        endforeach()
+    endif()
+
+    list(REMOVE_DUPLICATES to_register)
+    foreach(child ${to_register})
+        register_components("${base_dir}/${child}")
+    endforeach()
+
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_COMPONENT_NAME} ${PROJECT_NAME})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} "")
+    _abcmake_log_header(0 "${PROJECT_NAME} (component set)")
+endfunction()
+
 # Add an executable component to the project
 # @param TARGETNAME - name of the target to add the component
 # @param INCLUDE_DIR - path to the include directory
