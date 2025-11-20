@@ -16,49 +16,22 @@ set(ABCMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/cmake/abcmake"
 # Install root files
 install(FILES
     src/ab.cmake
+    src/abcmakeConfig.cmake
+    src/abcmakeConfigVersion.cmake
     src/version.cmake
     DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
 )
 
-# Install abcmake subdirectory files
 install(FILES
+    src/abcmake/_abcmake_add_project.cmake
     src/abcmake/_abcmake_log.cmake
     src/abcmake/_abcmake_property.cmake
-    src/abcmake/_abcmake_add_project.cmake
     src/abcmake/add_component.cmake
     src/abcmake/register_components.cmake
     src/abcmake/target_link_components.cmake
-    LICENSE
     DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}/abcmake
 )
 
-# Generate the config file that includes all the exports
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/abcmakeConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfig.cmake"
-    INSTALL_DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
-    PATH_VARS ABCMAKE_INSTALL_CMAKEDIR
-)
-
-# Generate the version file for the config file
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-# Install the generated config files
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/abcmakeConfigVersion.cmake"
-    DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
-)
-
-# Install LICENSE to abcmake subdirectory
-install(FILES
-    LICENSE
-    DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}/abcmake
-)
 
 # Copy installer and docs to package root (CMAKE_INSTALL_PREFIX)
 install(CODE "
