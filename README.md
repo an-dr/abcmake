@@ -28,6 +28,7 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
 - Automatic recursive discovery & linking of nested components.
 - Registry for linking components by *name* rather than path.
 - Component sets to register dependencies without creating local targets.
+- Automatic `<name>::<name>` aliases for components so parent projects can link after `add_subdirectory` without using abcmake.
 - Auto-detection of vendored CMake packages (`*Config.cmake`).
 - Generates `compile_commands.json` by default.
 - Install step for each built target near the build dir.
@@ -175,6 +176,14 @@ target_link_components(app
 ### `register_components(<path> ...)`
 
 Registers components so you can later link by name instead of path.
+
+Linking from a non-abcmake parent (just `add_subdirectory`):
+
+```cmake
+# Parent CMakeLists.txt (no abcmake include here)
+add_subdirectory(third_party/my_abcmake_component)
+target_link_libraries(app PRIVATE my_abcmake_component::my_abcmake_component)
+```
 
 ### `target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`
 

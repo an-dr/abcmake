@@ -42,6 +42,21 @@ function(target_sources_directory TARGETNAME SOURCE_DIR)
     endif()
 endfunction()
 
+# Create a simple namespaced alias (<name>::<name>) for a library target if not already present.
+function(_abcmake_add_namespace_alias TARGETNAME)
+    if (NOT TARGET ${TARGETNAME})
+        return()
+    endif()
+    get_target_property(_abc_type ${TARGETNAME} TYPE)
+    if (_abc_type STREQUAL "EXECUTABLE")
+        return() # aliases for executables are not supported
+    endif()
+    set(_abc_alias "${TARGETNAME}::${TARGETNAME}")
+    if (NOT TARGET ${_abc_alias})
+        add_library(${_abc_alias} ALIAS ${TARGETNAME})
+    endif()
+endfunction()
+
 # Install the target near the build directory
 # @param TARGETNAME - name of the target to install
 # @param DESTINATION - path to the destination directory inside the install dir
@@ -236,6 +251,8 @@ function(add_component TARGETNAME)
     else()
         add_library(${TARGETNAME} STATIC)
     endif()
+
+    _abcmake_add_namespace_alias(${TARGETNAME})
 
     message(DEBUG "[add_component] TARGETNAME: ${TARGETNAME}")
     message(DEBUG "[add_component] INCLUDE_DIR: ${arg_INCLUDE_DIR}")

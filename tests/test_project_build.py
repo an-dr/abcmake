@@ -45,6 +45,10 @@ class TestBuild(TestCMake):
         # Component set registers nested components for name-based linking
         self.build_cmake("test_component_set")
 
+    def test_alias_link(self):
+        # Parent CMake (no abcmake) links abcmake component via namespaced alias
+        self.build_cmake("test_alias_link")
+
 
 if __name__ == '__main__':
     unittest.main()

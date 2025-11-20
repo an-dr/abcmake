@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Added
 
 - `add_component_set` to register a group of components without creating local targets.
+- Automatic `<name>::<name>` aliases for components to simplify linking from parent projects that do not use abcmake.
 
 ## [6.3.0] - 2025-11-18
 
