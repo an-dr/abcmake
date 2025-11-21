@@ -74,15 +74,15 @@ add_component(mylib)
 
 ## Features
 
-✨ **Zero dependencies** - Pure CMake 3.15+, no Python or external tools
-🎯 **Convention over configuration** - Sensible defaults, override when needed
-🔍 **Automatic discovery** - Recursive component detection and linking
-📝 **Component registry** - Link by name instead of path
-🧩 **Component sets** - Bulk registration without building
-🔌 **Package auto-detection** - Vendored `*Config.cmake` packages just work
-🏷️ **Automatic aliases** - `<name>::<name>` for parent project compatibility
-🛠️ **IDE support** - Generates `compile_commands.json` by default
-📦 **Single-file distribution** - Just download `ab.cmake`
+- ✨ **Zero dependencies** - Pure CMake 3.15+, no Python or external tools
+- 🎯 **Convention over configuration** - Sensible defaults, override when needed
+- 🔍 **Automatic discovery** - Recursive component detection and linking
+- 📝 **Component registry** - Link by name instead of path
+- 🧩 **Component sets** - Bulk registration without building
+- 🔌 **Package auto-detection** - Vendored `*Config.cmake` packages just work
+- 🏷️ **Automatic aliases** - `<name>::<name>` for parent project compatibility
+- 🛠️ **IDE support** - Generates `compile_commands.json` by default
+- 📦 **Single-file distribution** - Just download `ab.cmake`
 
 ## Quick Start
 
