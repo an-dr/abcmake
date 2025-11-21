@@ -1,211 +1,348 @@
-﻿<div align="center">
+<div align="center">
 
 ![logo](docs/README/header.drawio.svg)
 
-Simple, component‑first CMake helper for small & medium C/C++ projects.
+**Simple, component‑first CMake helper for small & medium C/C++ projects**
 
 [![GitHub Release](https://img.shields.io/github/v/release/an-dr/abcmake?label=latest%20release)](https://github.com/an-dr/abcmake/releases)
 [![Build Test](https://github.com/an-dr/abcmake/actions/workflows/test.yml/badge.svg)](https://github.com/an-dr/abcmake/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CMake 3.15+](https://img.shields.io/badge/CMake-3.15+-064F8C?logo=cmake)](https://cmake.org/)
+
+[Quick Start](docs/quick-start.md) •
+[Documentation](#documentation) •
+[Examples](docs/examples.md) •
+[API Reference](docs/api.md)
 
 </div>
 
-`abcmake` (Andrei's Build CMake subsystem) lets you structure a codebase as independent *components* with minimal boilerplate: drop folders under `components/`, call one function, get targets, includes, and linking done automatically.
+---
 
-## Why abcmake?
+## Overview
 
-| Problem                                       | What abcmake Gives You                                   |
-| --------------------------------------------- | -------------------------------------------------------- |
-| Repeating `add_library` + globbing everywhere | Single `add_main_component()` + auto component discovery |
-| Hard to reuse internal modules                | Component folders become portable units                  |
-| Tedious dependency wiring                     | `target_link_components()` + optional registry by name   |
-| Vendored CMake packages cumbersome            | Auto‑detect `*Config.cmake` in `components/` and link    |
-| Monolithic CMakeLists.txt growth              | Split naturally by component directory                   |
+**abcmake** (Andrei's Build CMake subsystem) lets you structure codebases as independent *components* with minimal boilerplate. Drop folders under `components/`, call one function, and get automatic target creation, include paths, and linking.
+
+### Why abcmake?
+
+<table>
+<tr>
+<td width="50%">
+
+#### Traditional CMake
+
+```cmake
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+add_library(mylib ${SOURCES})
+target_include_directories(mylib PUBLIC include)
+
+add_subdirectory(components/comp_a)
+target_link_libraries(mylib PUBLIC comp_a)
+
+add_subdirectory(components/comp_b)
+target_link_libraries(mylib PUBLIC comp_b)
+
+# Repeat for every component...
+```
+
+</td>
+<td width="50%">
+
+#### With abcmake
+
+```cmake
+include(ab.cmake)
+
+add_component(mylib)
+
+# Done! All components auto-discovered
+# and linked, includes configured
+```
+
+</td>
+</tr>
+</table>
+
+### Key Benefits
+
+| Problem | abcmake Solution |
+|---------|-----------------|
+| 🔁 Repeating `add_library` + globbing everywhere | Single `add_component()` with auto-discovery |
+| 📦 Hard to reuse internal modules | Component folders become portable units |
+| 🔗 Tedious dependency wiring | Automatic linking + optional registry |
+| 📚 Vendored CMake packages cumbersome | Auto-detect & link `*Config.cmake` packages |
+| 📈 Monolithic CMakeLists.txt growth | Natural split by component directory |
 
 ## Features
 
-- Zero external Python/CMake dependency beyond stock CMake (>= 3.15).
-- Conventional project layout with overridable source/include directories.
-- Automatic recursive discovery & linking of nested components.
-- Registry for linking components by *name* rather than path.
-- Auto-detection of vendored CMake packages (`*Config.cmake`).
-- Generates `compile_commands.json` by default.
-- Install step for each built target near the build dir.
-- Single-file distributable (`ab.cmake`) published per GitHub Release.
-
-## Table Of Contents
-
-- [Why abcmake?](#why-abcmake)
-- [Features](#features)
-- [Table Of Contents](#table-of-contents)
-- [Quick Start](#quick-start)
-    - [Install](#install)
-    - [Use](#use)
-- [Concepts](#concepts)
-- [Public API](#public-api)
-    - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
-    - [`add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-shared-include_dir--source_dir-)
-    - [`register_components(<path> ...)`](#register_componentspath-)
-    - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
-        - [Auto Package Detection](#auto-package-detection)
-- [Advanced Usage](#advanced-usage)
-- [Limitations](#limitations)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-- [License](#license)
+- ✨ **Zero dependencies** - Pure CMake 3.15+, no Python or external tools
+- 🎯 **Convention over configuration** - Sensible defaults, override when needed
+- 🔍 **Automatic discovery** - Recursive component detection and linking
+- 📝 **Component registry** - Link by name instead of path
+- 🧩 **Component sets** - Bulk registration without building
+- 🔌 **Package auto-detection** - Vendored `*Config.cmake` packages just work
+- 🏷️ **Automatic aliases** - `<name>::<name>` for parent project compatibility
+- 🛠️ **IDE support** - Generates `compile_commands.json` by default
+- 📦 **Single-file distribution** - Just download `ab.cmake`
 
 ## Quick Start
 
-### Install
+### 1. Install
 
-**Project Scope**. Download a single-file distribution and put near your CMakeLists.txt:
+#### Option A: Project-Scoped (Recommended)
 
-- <https://github.com/an-dr/abcmake/releases>
+Download [`ab.cmake`](https://github.com/an-dr/abcmake/releases/latest/download/ab.cmake) to your project root.
 
-**User Scope**. Clone the repo and install it in your system:
+#### Option B: User/System-Wide
 
 ```bash
-git clone https://github.com/you/abcmake.git
+git clone https://github.com/an-dr/abcmake.git
 cd abcmake
 cmake -B build
 cmake --install build --prefix ~/.local
 ```
 
-For Windows:
+📖 [Detailed Installation Guide](docs/installation.md)
 
-- Use `$env:LOCALAPPDATA\CMake` instead of `~/.local`  also append the path:
+### 2. Create Your Project
 
-```cmake
-list(APPEND CMAKE_PREFIX_PATH "$ENV{LOCALAPPDATA}/CMake")
-find_package(abcmake REQUIRED)
-```
-
-**System-wide Scope**. Change prefix to `/usr/local` (Linux) or `C:\Program Files\CMake` (Windows), run with elevated privileges
-
-```bash
-git clone https://github.com/you/abcmake.git
-cd abcmake
-cmake -B build
-sudo cmake --install build --prefix /usr/local
-```
-
-### Use
-
-Minimal root `CMakeLists.txt`:
+**CMakeLists.txt:**
 
 ```cmake
 cmake_minimum_required(VERSION 3.15)
-project(HelloWorld)
+project(MyApp)
 
-find_package(abcmake REQUIRED) 
-# or include(ab.cmake) for single-file distribution
+include(ab.cmake)
 
 add_main_component(${PROJECT_NAME})
 ```
 
-Project layout:
+**src/main.cpp:**
 
-```text
-project/
-    CMakeLists.txt
-    ab.cmake
-    src/
-        main.cpp
-    include/        (optional public headers)
-    components/
-        mylib/
-            src/ ...
-            include/ ...
-            CMakeLists.txt  (uses abcmake + add_component())
+```cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, abcmake!" << std::endl;
+    return 0;
+}
 ```
 
-Add a component (`components/mylib/CMakeLists.txt`):
+**Build:**
+
+```bash
+cmake -B build
+cmake --build build
+./build/MyApp
+```
+
+### 3. Add a Component
+
+**components/greeter/CMakeLists.txt:**
 
 ```cmake
 cmake_minimum_required(VERSION 3.15)
-project(mylib)
+project(greeter)
 
-find_package(abcmake REQUIRED)
+include(../../ab.cmake)
 
 add_component(${PROJECT_NAME})
 ```
 
-## Concepts
+**components/greeter/include/greeter/greeter.hpp:**
 
-| Term           | Meaning                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------ |
-| Component      | A folder with its own `CMakeLists.txt` that calls `add_component` or `add_main_component`. |
-| Main component | The top-level executable (or library) defined with `add_main_component`.                   |
-| Registry       | A global list of discovered components (added via `register_components`).                  |
-| Auto package   | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package.  |
+```cpp
+#pragma once
+#include <string>
 
-## Public API
-
-### `add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`
-
-Creates an executable (or top-level library) and automatically:
-
-- Adds sources from provided `SOURCE_DIR` list (default `src`).
-- Adds include dirs (default `include` if exists).
-- Discovers & links nested components in `components/`.
-
-### `add_component(<name> [SHARED] [INCLUDE_DIR ...] [SOURCE_DIR ...])`
-
-Defines a static (default) or shared library component with the same discovery & inclusion mechanics.
-
-### `register_components(<path> ...)`
-
-Registers components so you can later link by name instead of path.
-
-### `target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`
-
-Links components to a target via explicit paths and/or previously registered names.
-
-#### Auto Package Detection
-
-Any directory in `components/` containing a `*Config.cmake` is probed with `find_package(<name> CONFIG PATHS <dir> NO_DEFAULT_PATH QUIET)`. Targets `<name>` or `<name>::<name>` are auto-linked if present.
-
-## Advanced Usage
-
-Linking multiple sources & includes:
-
-```cmake
-add_component(core \
-    INCLUDE_DIR include public_api \
-    SOURCE_DIR src generated)
+std::string greet(const std::string& name);
 ```
 
-Mix path + name linking:
+**components/greeter/src/greeter.cpp:**
 
-```cmake
-register_components(${CMAKE_CURRENT_LIST_DIR}/libs/math)
-target_link_components(app \
-    PATH ${CMAKE_CURRENT_LIST_DIR}/libs/io \
-    NAME math)
+```cpp
+#include "greeter/greeter.hpp"
+
+std::string greet(const std::string& name) {
+    return "Hello, " + name + "!";
+}
 ```
 
-Custom project layout (no `src/`):
+That's it! The component is automatically discovered, built, and linked.
+
+📖 [Full Quick Start Guide](docs/quick-start.md)
+
+## Documentation
+
+### Getting Started
+
+- 🚀 [Quick Start Guide](docs/quick-start.md) - Get up and running in 5 minutes
+- 📦 [Installation Guide](docs/installation.md) - Detailed installation options
+- 💡 [Core Concepts](docs/concepts.md) - Understand the component model
+
+### References
+
+- 📚 [API Reference](docs/api.md) - Complete function documentation
+- 🔧 [Examples](docs/examples.md) - Real-world usage patterns
+- 📝 [Changelog](CHANGELOG.md) - Version history and changes
+
+### Contributing
+
+- 🤝 [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- 🐛 [Issue Tracker](https://github.com/an-dr/abcmake/issues) - Report bugs or request features
+
+## Project Structure
+
+```text
+my_project/
+├── CMakeLists.txt              # include(ab.cmake) + add_main_component()
+├── ab.cmake                     # Single-file abcmake distribution
+├── src/                         # Main application sources
+│   └── main.cpp
+├── include/                     # (Optional) Public headers
+│   └── myapp/
+│       └── config.hpp
+└── components/                  # Auto-discovered components
+    ├── component_a/
+    │   ├── CMakeLists.txt       # add_component(component_a)
+    │   ├── include/component_a/
+    │   │   └── api.hpp
+    │   └── src/
+    │       └── impl.cpp
+    └── component_b/
+        ├── CMakeLists.txt
+        └── ...
+```
+
+## API at a Glance
 
 ```cmake
-add_main_component(App SOURCE_DIR source INCLUDE_DIR include)
+# Create main executable with auto-discovery
+add_main_component(<name> [SOURCE_DIR ...] [INCLUDE_DIR ...])
+
+# Create library component (static by default)
+add_component(<name> [SHARED|INTERFACE] [SOURCE_DIR ...] [INCLUDE_DIR ...])
+
+# Register components for name-based linking
+register_components(<path>...)
+
+# Link components by path or name
+target_link_components(<target> [PATH <path>...] [NAME <name>...])
+
+# Bulk register components without building
+add_component_set([PATH <path>] [COMPONENTS ...] [REGISTER_ALL])
 ```
+
+📖 [Complete API Documentation](docs/api.md)
+
+## Examples
+
+### Multiple Source Directories
+
+```cmake
+add_component(core
+    SOURCE_DIR src generated
+    INCLUDE_DIR include public_api)
+```
+
+### Component Registry
+
+```cmake
+# Register once
+register_components(
+    ${CMAKE_CURRENT_LIST_DIR}/components/logger
+    ${CMAKE_CURRENT_LIST_DIR}/components/config)
+
+# Link by name anywhere
+target_link_components(app NAME logger config)
+```
+
+### Shared Library
+
+```cmake
+add_component(myplugin SHARED)
+```
+
+### Header-Only Library
+
+```cmake
+add_component(templates INTERFACE)
+```
+
+📖 [More Examples](docs/examples.md)
+
+## Requirements
+
+- **CMake** 3.15 or higher
+- **C/C++ compiler** (GCC, Clang, MSVC, etc.)
+- **Platforms**: Linux, macOS, Windows
+
+## FAQ
+
+<details>
+<summary><b>Can I use abcmake with existing CMake projects?</b></summary>
+
+Yes! abcmake components create standard CMake targets with `<name>::<name>` aliases. Parent projects can use them with `add_subdirectory()` whether or not they use abcmake.
+</details>
+
+<details>
+<summary><b>Does abcmake support header-only libraries?</b></summary>
+
+Absolutely! Use `add_component(<name> INTERFACE)` for header-only components.
+</details>
+
+<details>
+<summary><b>How do I integrate third-party libraries?</b></summary>
+
+Drop vendored libraries with `*Config.cmake` into `components/` - they're auto-detected and linked. Or use standard CMake `find_package()` and `target_link_libraries()`.
+</details>
+
+<details>
+<summary><b>Can components have sub-components?</b></summary>
+
+Yes! Components can have their own `components/` directory with nested components. Discovery is recursive.
+</details>
+
+<details>
+<summary><b>Is abcmake suitable for large projects?</b></summary>
+
+abcmake is optimized for small to medium projects. Very large monorepos may prefer native CMake patterns for fine-grained control.
+</details>
 
 ## Limitations
 
-- One logical component per `CMakeLists.txt` (keep them focused).
-- Designed for small/medium modular trees; very large monorepos may prefer native CMake patterns.
+- 📋 One logical component per `CMakeLists.txt` (keeps components focused)
+- 🎯 Best suited for small/medium projects (large monorepos may need more control)
+- 🔧 Convention-based (less flexibility than raw CMake for complex scenarios)
 
 ## Contributing
 
-1. Fork & branch.
-2. Run the test suite: `python -m unittest discover -v` (from `tests/`).
-3. Keep PRs focused & update the **Unreleased** section in `CHANGELOG.md`.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for:
 
-## Changelog
+- 🐛 Reporting bugs
+- 💡 Suggesting features
+- 🔧 Development setup
+- ✅ Running tests
+- 📝 Documentation improvements
 
-See [CHANGELOG.md](CHANGELOG.md) for structured history.
+**Testing:**
+
+```bash
+cd tests
+python -m unittest discover -v
+```
 
 ## License
 
-MIT License © Andrei Gramakov.
+MIT License © [Andrei Gramakov](https://github.com/an-dr)
 
 See [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#overview)**
+
+Made with ❤️ by the abcmake community
+
+</div>

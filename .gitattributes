@@ -2,6 +2,8 @@
 # Linguist
 # ==========================
 docs/** linguist-documentation
+examples/** linguist-language=ignore
+scripts/** linguist-language=ignore
 tests/** linguist-language=ignore
 
 # ==========================

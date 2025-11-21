@@ -29,10 +29,32 @@ endfunction()
 
 # Add all source files from the specified directory to the target
 # @param TARGETNAME - name of the target to add sources
+# @param SOURCE_DIR - path to the source directory
+# @param INTERFACE - if set, use INTERFACE visibility instead of PRIVATE
 function(target_sources_directory TARGETNAME SOURCE_DIR)
+    cmake_parse_arguments(arg "INTERFACE" "" "" ${ARGN})
     file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.c")
-    message( DEBUG "[target_sources_directory] ${TARGETNAME} sources: ${SOURCES}")
-    target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+    message(DEBUG "[target_sources_directory] ${TARGETNAME} sources: ${SOURCES}")
+    if (arg_INTERFACE)
+        target_sources(${TARGETNAME} INTERFACE ${SOURCES})
+    else()
+        target_sources(${TARGETNAME} PRIVATE ${SOURCES})
+    endif()
+endfunction()
+
+# Create a simple namespaced alias (<name>::<name>) for a library target if not already present.
+function(_abcmake_add_namespace_alias TARGETNAME)
+    if (NOT TARGET ${TARGETNAME})
+        return()
+    endif()
+    get_target_property(_abc_type ${TARGETNAME} TYPE)
+    if (_abc_type STREQUAL "EXECUTABLE")
+        return() # aliases for executables are not supported
+    endif()
+    set(_abc_alias "${TARGETNAME}::${TARGETNAME}")
+    if (NOT TARGET ${_abc_alias})
+        add_library(${_abc_alias} ALIAS ${TARGETNAME})
+    endif()
 endfunction()
 
 # Install the target near the build directory
@@ -69,8 +91,9 @@ endfunction()
 # @param TARGETNAME - name of the target to initialize
 # @param INCLUDE_DIR - path to the include directory
 # @param SOURCE_DIR - path to the source directory
+# @param INTERFACE - if set, treat as interface library (sources compile in consumer)
 function(_abcmake_target_init TARGETNAME)
-    set(flags)
+    set(flags INTERFACE)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
@@ -98,14 +121,63 @@ function(_abcmake_target_init TARGETNAME)
     
     # Add target to the target list
     _abcmake_append_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} ${TARGETNAME})
-    
+
     foreach(s ${arg_SOURCE_DIR})
-        target_sources_directory(${TARGETNAME} ${s})
+        if (arg_INTERFACE)
+            target_sources_directory(${TARGETNAME} ${s} INTERFACE)
+        else()
+            target_sources_directory(${TARGETNAME} ${s})
+        endif()
     endforeach()
-    
-    target_include_directories(${TARGETNAME} PUBLIC ${arg_INCLUDE_DIR})
+
+    if (arg_INTERFACE)
+        target_include_directories(${TARGETNAME} INTERFACE ${arg_INCLUDE_DIR})
+    else()
+        target_include_directories(${TARGETNAME} PUBLIC ${arg_INCLUDE_DIR})
+    endif()
     _abcmake_add_components(${process_level} ${TARGETNAME})
 
+endfunction()
+
+# Add a component set that only registers nested components (no targets)
+# @param PATH - base directory containing components (defaults to abcmake components dir)
+# @param COMPONENTS - names of subdirectories to register
+# @param REGISTER_ALL - if set, register every subdirectory under PATH
+function(add_component_set)
+    set(flags REGISTER_ALL)
+    set(args)
+    set(listArgs PATH COMPONENTS)
+    cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
+
+    if (NOT arg_PATH)
+        _abcmake_get_components(arg_PATH)
+    endif()
+
+    set(base_dir ${arg_PATH})
+    if (NOT IS_ABSOLUTE "${base_dir}")
+        set(base_dir "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}")
+    endif()
+
+    set(to_register ${arg_COMPONENTS})
+
+    if (arg_REGISTER_ALL)
+        file(GLOB children RELATIVE "${base_dir}" "${base_dir}/*")
+        foreach(child ${children})
+            if (IS_DIRECTORY "${base_dir}/${child}")
+                list(APPEND to_register ${child})
+            endif()
+        endforeach()
+    endif()
+
+    list(REMOVE_DUPLICATES to_register)
+    foreach(child ${to_register})
+        register_components("${base_dir}/${child}")
+    endforeach()
+
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_VERSION} ${ABCMAKE_VERSION})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_COMPONENT_NAME} ${PROJECT_NAME})
+    _abcmake_set_prop_curdir(${ABCMAKE_DIRPROP_TARGETS} "")
+    _abcmake_log_header(0 "${PROJECT_NAME} (component set)")
 endfunction()
 
 # Add an executable component to the project
@@ -151,9 +223,10 @@ endfunction()
 # @param TARGETNAME - name of the target to add the component
 # @param INCLUDE_DIR - paths to the include directories
 # @param SOURCE_DIR - paths to the source directories
-# @param SHARED - if set to TRUE, the library will be shared
+# @param SHARED - if set, the library will be shared
+# @param INTERFACE - if set, the library will be an interface library
 function(add_component TARGETNAME)
-    set(flags SHARED)
+    set(flags SHARED INTERFACE)
     set(args)
     set(listArgs INCLUDE_DIR SOURCE_DIR)
     cmake_parse_arguments(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
@@ -171,25 +244,37 @@ function(add_component TARGETNAME)
         endif()
     endif()
 
-    if (arg_SHARED)
+    if (arg_INTERFACE)
+        add_library(${TARGETNAME} INTERFACE)
+    elseif (arg_SHARED)
         add_library(${TARGETNAME} SHARED)
     else()
         add_library(${TARGETNAME} STATIC)
     endif()
-    
+
+    _abcmake_add_namespace_alias(${TARGETNAME})
+
     message(DEBUG "[add_component] TARGETNAME: ${TARGETNAME}")
     message(DEBUG "[add_component] INCLUDE_DIR: ${arg_INCLUDE_DIR}")
     message(DEBUG "[add_component] SOURCE_DIR: ${arg_SOURCE_DIR}")
     message(DEBUG "[add_component] SHARED: ${arg_SHARED}")
-    
+    message(DEBUG "[add_component] INTERFACE: ${arg_INTERFACE}")
+
     # Set Component Src and Include
     _abcmake_set_prop_curdir("${ABCMAKE_DIRPROP_SRC}" "${arg_SOURCE_DIR}")
     _abcmake_set_prop_curdir("${ABCMAKE_DIRPROP_INCLUDE}" "${arg_INCLUDE_DIR}")
-    
-    _abcmake_target_init(${TARGETNAME} 
-                         INCLUDE_DIR ${arg_INCLUDE_DIR} 
-                         SOURCE_DIR ${arg_SOURCE_DIR})
-    _abcmake_target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
+
+    if (arg_INTERFACE)
+        _abcmake_target_init(${TARGETNAME}
+                             INTERFACE
+                             INCLUDE_DIR ${arg_INCLUDE_DIR}
+                             SOURCE_DIR ${arg_SOURCE_DIR})
+    else()
+        _abcmake_target_init(${TARGETNAME}
+                             INCLUDE_DIR ${arg_INCLUDE_DIR}
+                             SOURCE_DIR ${arg_SOURCE_DIR})
+        _abcmake_target_install(${TARGETNAME} ${ABC_INSTALL_LIB_SUBDIR})
+    endif()
 endfunction()
 
 # add_component.cmake ==========================================================
