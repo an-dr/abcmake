@@ -43,13 +43,8 @@ Simple, component‑first CMake helper for small & medium C/C++ projects.
     - [Install](#install)
     - [Use](#use)
 - [Concepts](#concepts)
-- [Public API](#public-api)
-    - [`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_main_componentname-include_dir--source_dir-)
-    - [`add_component(<name> [SHARED|INTERFACE] [INCLUDE_DIR ...] [SOURCE_DIR ...])`](#add_componentname-sharedinterface-include_dir--source_dir-)
-    - [`add_component_set([PATH <path>] [COMPONENTS <names>...] [REGISTER_ALL])`](#add_component_setpath-path-components-names-register_all)
-    - [`register_components(<path> ...)`](#register_componentspath-)
-    - [`target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`](#target_link_componentstarget-path-path--name-comp-)
-        - [Auto Package Detection](#auto-package-detection)
+- [Public API Quick reference](#public-api-quick-reference)
+- [Auto Package Detection](#auto-package-detection)
 - [Advanced Usage](#advanced-usage)
 - [Limitations](#limitations)
 - [Contributing](#contributing)
@@ -141,55 +136,26 @@ add_component(${PROJECT_NAME})
 | Registry       | A global list of discovered components (added via `register_components`).                  |
 | Auto package   | A directory under `components/` containing `*Config.cmake` -> treated as a CMake package.  |
 
-## Public API
+## Public API Quick reference
 
-### `add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`
+See also: [Detailed API description](docs/api.md)
 
-Creates an executable (or top-level library) and automatically:
+**`add_main_component(<name> [INCLUDE_DIR ...] [SOURCE_DIR ...])`**  
+Creates executable/top-lib. Auto-discovers nested components.
 
-- Adds sources from provided `SOURCE_DIR` list (default `src`).
-- Adds include dirs (default `include` if exists).
-- Discovers & links nested components in `components/`.
+**`add_component(<name> [SHARED|INTERFACE] [INCLUDE_DIR ...] [SOURCE_DIR ...])`**  
+Creates library component (static/shared/interface).
 
-### `add_component(<name> [SHARED|INTERFACE] [INCLUDE_DIR ...] [SOURCE_DIR ...])`
+**`register_components(<path>...)`**  
+Registers components for name-based linking.
 
-Defines a static (default), shared, or interface library component with the same discovery & inclusion mechanics. Use `INTERFACE` for header-only libraries or source-distribution libraries where code compiles in the consumer's context.
+**`target_link_components(<target> [PATH <path>...] [NAME <comp>...])`**  
+Links components by path or name.
 
-### `add_component_set([PATH <path>] [COMPONENTS <names>...] [REGISTER_ALL])`
+**`add_component_set([PATH <path>] [COMPONENTS <names>...] [REGISTER_ALL])`**  
+Bulk-registers components without local target.
 
-Registers components contained in a folder without creating a local target. Helpful for distributing groups of dependencies that parents can link by name later.
-
-```cmake
-# components/plugins/CMakeLists.txt
-project(Plugins)
-include(ab.cmake)
-add_component_set(REGISTER_ALL) # registers every subdir of components/
-```
-
-```cmake
-# Parent consumer
-target_link_components(app
-    PATH ${CMAKE_CURRENT_LIST_DIR}/components/plugins
-    NAME nested_hello)
-```
-
-### `register_components(<path> ...)`
-
-Registers components so you can later link by name instead of path.
-
-Linking from a non-abcmake parent (just `add_subdirectory`):
-
-```cmake
-# Parent CMakeLists.txt (no abcmake include here)
-add_subdirectory(third_party/my_abcmake_component)
-target_link_libraries(app PRIVATE my_abcmake_component::my_abcmake_component)
-```
-
-### `target_link_components(<target> [PATH <path> ...] [NAME <comp> ...])`
-
-Links components to a target via explicit paths and/or previously registered names.
-
-#### Auto Package Detection
+## Auto Package Detection
 
 Any directory in `components/` containing a `*Config.cmake` is probed with `find_package(<name> CONFIG PATHS <dir> NO_DEFAULT_PATH QUIET)`. Targets `<name>` or `<name>::<name>` are auto-linked if present.
 
