@@ -442,11 +442,12 @@ target_link_components(myapp
 
 ### Link Visibility
 
-All component links use `PUBLIC` visibility by default:
+All component links use `PRIVATE` visibility by default:
 
-- Component dependencies propagate to consumers
-- Transitive dependencies handled automatically
-- Include paths propagate through link chain
+- Component dependencies are implementation details
+- Changes to components don't trigger rebuilds of downstream consumers
+- Cleaner dependency graphs without transitive bloat
+- INTERFACE libraries automatically use INTERFACE visibility
 
 ## Component Sets
 

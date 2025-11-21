@@ -4,18 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Added
-
-- `add_component_set` to register a group of components without creating local targets.
-- Automatic `<name>::<name>` aliases for components to simplify linking from parent projects that do not use abcmake.
-
 ## [6.3.0] - 2025-11-18
 
 ### Added
 
 - Support of header-only and source libraries via INTERFACE
+- `add_component_set` to register a group of components without creating local targets.
+- Automatic `<name>::<name>` aliases for components to simplify linking from parent projects that do not use abcmake.
 
 ## [6.2.0] - 2025-09-17
 
