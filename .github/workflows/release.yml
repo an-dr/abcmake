@@ -39,6 +39,11 @@ jobs:
         shell: pwsh
         run: ./scripts/build_vcpkg_port.ps1 -Tag "${{ steps.version.outputs.tag }}"
 
+      - name: Zip vcpkg port
+        run: |
+          cd dist/vcpkg-port
+          zip -r ../abcmake-vcpkg-port.zip .
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
@@ -50,13 +55,14 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: abcmake ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
           body: |
             Automated release for ${{ steps.version.outputs.tag }}.
             The single-file module and CMake package are attached as assets.
 
-            **vcpkg port**: ready-to-use port files are in the release artifacts.
+            **vcpkg port**: ready-to-use port files are in `abcmake-vcpkg-port.zip`.
           files: |
             dist/single_file/ab.cmake
+            dist/abcmake-vcpkg-port.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

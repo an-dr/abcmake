@@ -95,7 +95,8 @@ Download [`ab.cmake`](https://github.com/an-dr/abcmake/releases/latest/download/
 #### Option B: Package Manager (vcpkg, CPM)
 
 ```bash
-vcpkg install abcmake  # vcpkg
+# vcpkg overlay port – download abcmake-vcpkg-port.zip from the release page
+vcpkg install abcmake --overlay-ports=/path/to/vcpkg-port
 ```
 
 ```cmake

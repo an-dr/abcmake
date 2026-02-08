@@ -19,15 +19,13 @@ If your project already uses a C++ package manager, this is the easiest way to g
 
 ### vcpkg
 
-Install via the [vcpkg](https://vcpkg.io) registry:
+Use the overlay port shipped in [release artifacts](https://github.com/an-dr/abcmake/releases) (`abcmake-vcpkg-port.zip`) or in this repository (`ports/`):
 
 ```bash
-vcpkg install abcmake
-```
+# From release artifacts
+vcpkg install abcmake --overlay-ports=/path/to/vcpkg-port
 
-Or use the overlay port shipped in this repository:
-
-```bash
+# From the repository clone
 vcpkg install abcmake --overlay-ports=/path/to/abcmake/ports
 ```
 
