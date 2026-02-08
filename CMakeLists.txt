@@ -33,15 +33,10 @@ install(FILES
 )
 
 
-# Copy installer and docs to package root (CMAKE_INSTALL_PREFIX)
-install(CODE "
-    file(COPY ${CMAKE_CURRENT_LIST_DIR}/LICENSE 
-         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
-    file(COPY ${CMAKE_CURRENT_LIST_DIR}/README.md 
-         DESTINATION \"\${CMAKE_INSTALL_PREFIX}\")
-    
-    message(STATUS \"Package root files installed to: \${CMAKE_INSTALL_PREFIX}\")
-")
+# Install docs alongside the cmake package
+install(FILES LICENSE README.md
+    DESTINATION ${ABCMAKE_INSTALL_CMAKEDIR}
+)
 
 # Display installation information
 message(STATUS "abcmake version ${PROJECT_VERSION}")

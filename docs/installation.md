@@ -4,16 +4,71 @@ This guide covers different methods to install and use abcmake in your projects.
 
 ## Table of Contents
 
-- [Quick Installation](#quick-installation)
+- [Using Package Managers](#using-package-managers)
+  - [vcpkg](#vcpkg)
+  - [CPM](#cpm)
 - [Project-Scoped Installation](#project-scoped-installation)
 - [User-Scoped Installation](#user-scoped-installation)
 - [System-Wide Installation](#system-wide-installation)
 - [Verification](#verification)
 - [Troubleshooting](#troubleshooting)
 
-## Quick Installation
+## Using Package Managers
 
-For most users, the **project-scoped** approach is the simplest and most portable option.
+If your project already uses a C++ package manager, this is the easiest way to get abcmake.
+
+### vcpkg
+
+Install via the [vcpkg](https://vcpkg.io) registry:
+
+```bash
+vcpkg install abcmake
+```
+
+Or use the overlay port shipped in this repository:
+
+```bash
+vcpkg install abcmake --overlay-ports=/path/to/abcmake/ports
+```
+
+Then in your CMakeLists.txt:
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(MyProject)
+
+find_package(abcmake REQUIRED)
+add_main_component(${PROJECT_NAME})
+```
+
+Configure with the vcpkg toolchain file as usual:
+
+```bash
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+```
+
+### CPM
+
+Add abcmake with [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake):
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(MyProject)
+
+include(cmake/CPM.cmake)  # or however you bootstrap CPM
+
+CPMAddPackage(
+    NAME abcmake
+    GITHUB_REPOSITORY an-dr/abcmake
+    VERSION 6.4.0
+    DOWNLOAD_ONLY YES
+)
+include(${abcmake_SOURCE_DIR}/src/ab.cmake)
+
+add_main_component(${PROJECT_NAME})
+```
+
+`DOWNLOAD_ONLY YES` is used because abcmake is a pure CMake module - no compilation needed.
 
 ## Project-Scoped Installation
 

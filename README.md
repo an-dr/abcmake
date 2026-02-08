@@ -92,7 +92,18 @@ add_component(mylib)
 
 Download [`ab.cmake`](https://github.com/an-dr/abcmake/releases/latest/download/ab.cmake) to your project root.
 
-#### Option B: User/System-Wide
+#### Option B: Package Manager (vcpkg, CPM)
+
+```bash
+vcpkg install abcmake  # vcpkg
+```
+
+```cmake
+CPMAddPackage("gh:an-dr/abcmake@6.4.0" DOWNLOAD_ONLY YES)  # CPM
+include(${abcmake_SOURCE_DIR}/src/ab.cmake)
+```
+
+#### Option C: User/System-Wide
 
 ```bash
 git clone https://github.com/an-dr/abcmake.git

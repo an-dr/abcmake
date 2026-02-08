@@ -35,12 +35,17 @@ jobs:
           python scripts/build_single_file.py --check || python scripts/build_single_file.py
           echo "Generated dist/single_file/ab.cmake"
 
+      - name: Generate vcpkg registry port
+        shell: pwsh
+        run: ./scripts/build_vcpkg_port.ps1 -Tag "${{ steps.version.outputs.tag }}"
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: abcmake-${{ steps.version.outputs.tag }}
           path: |
             dist/single_file/ab.cmake
+            dist/vcpkg-port/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -49,6 +54,8 @@ jobs:
           body: |
             Automated release for ${{ steps.version.outputs.tag }}.
             The single-file module and CMake package are attached as assets.
+
+            **vcpkg port**: ready-to-use port files are in the release artifacts.
           files: |
             dist/single_file/ab.cmake
         env:
